@@ -1,0 +1,11 @@
+interface:
+  display_name: seedance 2 5
+  short_description: Prompts vidéo, références et corrections Seedance 2.5
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - atlas
+  allow_implicit_invocation: true
