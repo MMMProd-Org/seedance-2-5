@@ -1,0 +1,27 @@
+6-second video, 9:16 vertical, real-time. Exactly two connected shots of 3 seconds each, one hard cut at 3 seconds. Live-action night exterior in cyberpunk La Defense, Paris, 2077.
+
+REFERENCES
+@ophelie: preserve her front close-up face, green-hazel eyes, freckles, wavy dark-brown hair and slim proportions. Use the full-length front-view costume: charcoal cropped top with buckled straps, loose black cargo trousers, dark lace-up footwear and jacket slipped around her forearms. Ignore the sheet background, grid and labels.
+@def3: location master for the glass entrance, dark stone planters, wet tiled sidewalk and metal railings beside the avenue. Ignore its background figures and landscape framing.
+@def4: wet paving and dark metal railing materials only; ignore its opposite-side layout.
+@def1: glass tower window grids and tall screens integrated into facades only; ignore its roadway viewpoint.
+@def2: pale Grande Arche and its rectangular opening only; ignore its road-centre framing.
+@Etalo: grade and photographic texture only, natural skin, warm practical highlights, subdued cool accents and detail in black clothing. Ignore its man, car, location and composition. Location references do not override this grade.
+
+Ophelie tries to make the wait look ordinary while checking for her pickup. Mehdi and his red-and-black Mustang remain off-screen. She waits outside the glass entrance, angled toward the avenue, doors behind her. One slim black watch on her left wrist below the sleeve.
+
+SHOT 1, 0-3s
+She checks screen-left along the avenue, then screen-right, shoulders slightly raised. Neither direction reveals her pickup. She briefly raises her left wrist to check the watch, then starts lowering it. Her head begins turning back toward the entrance as the shot ends.
+Wide shot, head to boots with space around her, towers rising behind. Camera handheld at hip height, looking slightly upward, already travelling left-to-right through a short arc from front three-quarter toward frontal. Keep her whole body visible through the cut. A nearby railing post crosses the frame edge faster than the distant facades.
+Warm entrance light from behind screen-left rims her hair and jacket; cooler street fill from front-right exposes her shaded front. Wet paving reflects these practical sources. Natural skin, soft highlights and restrained saturation matching @Etalo.
+
+SHOT 2, 3-6s
+Hard cut on the continuing head turn to chest-up, left wrist still lowering out of frame. She completes a glance over her shoulder toward the glass doors, checking whether someone is coming out. Allow a brief profile. Her searching look holds for about one second; her inhale catches once, audible. She turns back toward the expected pickup, screen-left, releasing a measured breath to regain composure. Her gaze stays down the avenue through the final beat, jaw still slightly set. The threat remains unconfirmed.
+Chest-up, whole head and shoulders visible. Camera handheld just below eye level, looking slightly upward, already continuing the left-to-right arc from frontal toward the opposite front three-quarter. Background perspective appears compressed, illuminated facade lines sliding softly out of focus behind her. End still chest-up and still moving.
+Warm entrance light from behind screen-left rims her hair and reaches her cheek as she turns toward the doors. Cooler street fill from front-right keeps her returning eyes visible; the opposite cheek stays darker. Natural skin, soft highlights and restrained saturation matching @Etalo.
+
+Both arcs remain on the curb side of Ophelie. The operator's side steps cause small irregular vertical dips of the frame. Her framing drifts sideways during the arc; the operator corrects a fraction late, with a slight overshoot. Camera movement remains independent of her gestures. Preserve shot size while allowing this framing drift. No zoom.
+
+Background traffic holds its lanes with right-hand circulation: white headlights approaching, red taillights receding; drivers do not react to her. Preserve identity, costume, left-wrist watch, waiting spot, entrance and grade across the cut. End with her left arm lowered and attention on the avenue.
+
+Quiet traffic and tyre hiss throughout. No dialogue, music, subtitles or additional cuts.
