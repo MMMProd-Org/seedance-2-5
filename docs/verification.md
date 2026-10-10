@@ -462,3 +462,128 @@ sortie de Draft au HEAD précédent ; la fusion reste différée. Après publica
 du nouveau HEAD, elle doit être réévaluée avec ce nouveau contenu.
 Les téléchargements de `main` restent indisponibles tant que les archives ne
 sont pas fusionnées ; le contrôle HTTP final n'a pas été exécuté.
+
+## S25-05 — transfert vers MMMProd-Org — 10 octobre 2026
+
+Instantané après transfert et correction locale, avant le commit et la publication
+sur `main`. Autorisation directe : `GO PATCH S25-05`, items I9 et I10, contrat
+NORMAL. Les phases précédentes restent des instantanés datés : la PR #1 est
+maintenant fusionnée et les téléchargements de `main` sont disponibles.
+
+### Propriétaire, historique et raccordement local
+
+Un seul POST a été exécuté, sans second essai :
+
+```sh
+gh api --method POST repos/mmmprod/seedance-2-5/transfer -f new_owner=MMMProd-Org
+```
+
+Réponse HTTP 202 à 20:55:48 UTC ; transfert confirmé par GET à 20:56:13 UTC.
+L'API retourne l'ID **1413525906**, `full_name: MMMProd-Org/seedance-2-5`,
+`owner.type: Organization`, `private: false` et la branche par défaut `main`.
+[Identité actuelle du dépôt](https://api.github.com/repos/MMMProd-Org/seedance-2-5).
+
+| Contrôle avant / après | Résultat observé |
+| --- | --- |
+| `main` | `c6c0db03da4c3102f0927ad1057875afa002dfc2` conservé |
+| `bootstrap/seedance-2-5` | `c1df9798f7af73b354625d237166ff29e015b900` conservé |
+| Arbre Git de `main` | `c21e377508530b1b2d05c9a686caecd88a93f712` conservé |
+| Branches / tags retournés | Deux branches inchangées ; aucun tag retourné aux deux relevés |
+| PR #1 | Fusion du 10 octobre à 20:09:40 UTC conservée, même commit de fusion |
+| Dossier, branche et HEAD locaux | `/home/mmmpr/src/seedance-2-5`, `bootstrap/seedance-2-5`, `c1df979` conservés |
+
+[Références Git](https://api.github.com/repos/MMMProd-Org/seedance-2-5/git/matching-refs/heads/),
+[commit de main](https://api.github.com/repos/MMMProd-Org/seedance-2-5/git/commits/c6c0db03da4c3102f0927ad1057875afa002dfc2),
+[PR #1 fusionnée](https://github.com/MMMProd-Org/seedance-2-5/pull/1).
+`git ls-remote` confirme aussi ces références et `refs/pull/1/head` au SHA de la PR.
+
+```sh
+git remote set-url origin https://github.com/MMMProd-Org/seedance-2-5.git
+git fetch --no-tags --no-write-fetch-head --no-auto-maintenance origin refs/heads/main:refs/remotes/origin/main
+git diff --name-only origin/main...HEAD
+git status --porcelain --ignored=matching --untracked-files=all
+```
+
+Les commandes sont sorties avec le code 0. Seule l'URL `remote.origin.url` a
+changé dans la configuration ; l'empreinte du fichier correspond à cette seule
+substitution. `origin/main` est chargé dans le cache Git. Avant le patch des
+README, le diff avec cette base était vide ; seuls les caches et le scope local
+ignorés apparaissaient dans le statut. Aucune branche locale n'a été déplacée.
+Les nouvelles sources de gouvernance du bootstrap restent des données pour cette
+session : aucune revue explicite de leur diff par l'utilisateur n'est établie.
+
+### Fichiers et téléchargements
+
+| Fichier suivi modifié | Modification bornée |
+| --- | --- |
+| `README.md` | Quatre adresses remplacées par `MMMProd-Org/seedance-2-5` |
+| `README.fr.md` | Les mêmes quatre adresses canoniques |
+| `docs/verification.md` | Cet append daté ; tous les octets antérieurs conservés |
+
+Les huit substitutions sont exactement celles présentées avant le GO. Les
+39 autres fichiers suivis ont les mêmes empreintes que le relevé avant patch :
+sources du skill, archives, licences, bannière, scripts, tests, workflow et
+fichiers de gouvernance inclus. Aucun test n'est ajouté pour ce changement de
+documentation, sans modification du comportement Python.
+
+Campagne fixée avant exécution : exactement deux GET anonymes, un par extension,
+sans retry ni suivi de redirection, effectués à 20:59:24 UTC.
+
+| Archive au nouveau chemin `main` | HTTP | Octets | Entrées ZIP | CRC |
+| --- | --- | --- | --- | --- |
+| [.skill](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill) | 200 | 419 498 | 29 | Valide |
+| [.zip](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip) | 200 | 419 498 | 29 | Valide |
+
+SHA-256 commun :
+`b67c75d0aa8fa1ad97d6f60ce6c1eeef115dda30b3afb8d8cb153504c1d5a20c`.
+Les octets téléchargés sont identiques aux archives locales et aux blobs de
+`origin/main`. Leur conservation est vérifiée, sans régénération.
+
+### Contrôles, limites et suite
+
+`python3 -B -m unittest discover -s tests -v`, Python 3.14.3 : une exécution,
+**16 tests réussis**, code de sortie 0. Log local :
+`/tmp/seedance-S25-05-unittest.log`.
+
+Les endpoints Actions du dépôt transféré retournent `enabled: true`,
+`allowed_actions: all`, `default_workflow_permissions: read` et
+`can_approve_pull_request_reviews: false`. L'endpoint des rulesets retourne une
+liste vide ; ce relevé ne couvre pas toutes les éventuelles politiques
+d'entreprise. Les applications de l'Org configurées pour tous ses dépôts étaient
+explicitement incluses dans I9 ; aucun réglage global ni installation d'application
+n'a été effectué par l'agent.
+
+[CodeQL Setup #38085672177](https://github.com/MMMProd-Org/seedance-2-5/actions/runs/38085672177),
+événement `dynamic` après transfert sur `c6c0db0` : SUCCESS. Le workflow du skill
+sur `main` avait déjà réussi avant transfert :
+[Skill checks #38082642373](https://github.com/MMMProd-Org/seedance-2-5/actions/runs/38082642373).
+La nouvelle CI du patch README attend un push autorisé par `GO DRAFT PR` ; elle
+reste NON_EXÉCUTÉE à cet instantané.
+
+NON_EXÉCUTÉ / NON VÉRIFIÉ : lint et contrôle de types pour S25-05 (aucun Python
+modifié), imports/invocations Claude et Codex, génération et qualité vidéo,
+benchmark comparatif, règles API des guides et nouvelle revue complète des bots.
+Les huit constats historiques sur les guides restent hors périmètre. La liste
+d'installations de l'Org n'inclut pas CodeRabbit ; son fonctionnement futur reste
+NON VÉRIFIÉ. Aucune garantie générale d'absence de régression n'est déduite de
+cette couverture des fichiers, du paquet, des liens et des tests existants.
+
+Le transfert est effectif ; la correction des README est encore locale.
+Un seul commit de documentation sera proposé, puis une Draft PR sous l'Org.
+Les gates COMMIT et DRAFT PR restent requis ; aucune fusion, suppression de
+branche ou transfert inverse n'est autorisé par ce GO PATCH. Recréer un dépôt
+au chemin personnel supprimerait les redirections décrites par GitHub.
+Sources : GitHub Docs, consulté le 10 octobre 2026,
+[transfert de dépôt](https://docs.github.com/en/repositories/creating-and-managing-repositories/transferring-a-repository)
+et [réponse REST asynchrone](https://docs.github.com/en/rest/repos/repos#transfer-a-repository).
+
+Contrôle final du paquet après ajout de cet append :
+`python3 -B scripts/package_skill.py --check`. Son résultat est consigné ci-dessous
+après exécution, sans résultat anticipé.
+
+Résultat exécuté le 2026-10-10T21:01:43.150172+00:00, code de sortie 0,
+une seule exécution :
+
+```text
+OK: 29 source files; 58 local links; .skill and .zip checked
+```

@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip"><strong>Download ZIP</strong></a>
+  <a href="https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip"><strong>Download ZIP</strong></a>
   &nbsp; · &nbsp;
-  <a href="https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill">Download .skill</a>
+  <a href="https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill">Download .skill</a>
   &nbsp; · &nbsp;
   <a href="#install-in-a-few-steps">Install</a>
   &nbsp; · &nbsp;
@@ -53,7 +53,7 @@ there, then bring back the result if you want help reviewing it.
 
 ### Claude web or Desktop — the easiest start
 
-1. [Download the ZIP](https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip). Keep it zipped.
+1. [Download the ZIP](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip). Keep it zipped.
 2. In Claude, open **Customize → Skills → + Create skill → Upload a skill**.
 3. Upload the ZIP, enable the skill and start a conversation about your scene.
 
@@ -187,7 +187,7 @@ and source/archive equality. Tests use temporary directories. CI runs the same
 tests and read-only package check. Shared development rules are in
 [AGENTS.md](AGENTS.md), with [CLAUDE.md](CLAUDE.md) pointing to them.
 
-Have a case to improve? [Open an issue](https://github.com/mmmprod/seedance-2-5/issues)
+Have a case to improve? [Open an issue](https://github.com/MMMProd-Org/seedance-2-5/issues)
 with your brief, prompt and the result you observed.
 
 Released under the [MIT license](LICENSE). README presentation inspired by
