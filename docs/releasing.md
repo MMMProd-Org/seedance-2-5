@@ -21,9 +21,12 @@ python3 -B scripts/release_skill.py --check --base FULL_PR_BASE_SHA
 ```
 
 The last command prints the validated version and uses no network or writes.
-Without --base it compares against HEAD's first parent. For an uncommitted
-change or PR, supply the full base commit SHA to compare the intended changes.
-The workflow supplies the PR base automatically.
+Without --base it compares against HEAD's first parent, covering one commit.
+For an uncommitted change, PR or several commits, supply the full base commit
+SHA to compare all intended changes. The workflow supplies the PR base for
+pull requests and the pre-push commit for pushes. Both its check and publication
+jobs use that pre-push base, so a final documentation commit cannot hide an
+earlier skill or version change in the same push.
 
 Change VERSION whenever the skill or its downloads change. Reusing or lowering
 a version fails the check. A README-only change keeps the existing version and
@@ -58,7 +61,10 @@ the ZIP's hash; compare it with the corresponding line in SHA256SUMS.
 The publication job alone receives contents: write, through the native
 GITHUB_TOKEN. No personal access token or repository-wide permission change is
 required. The publisher rejects other event, repository, branch or checkout
-contexts. Workflow runs for different main commits are not cancelled; release
+contexts. Publication requires BASE_SHA from the push event; a missing, empty,
+invalid or unknown base fails before any GitHub write. An explicit all-zero SHA
+is treated as initialization without a previous reference, not as a missing
+base. Workflow runs for different main commits are not cancelled; release
 jobs serialize by version so separate versions retain their pending jobs.
 
 ## An interrupted or failed publication

@@ -1,6 +1,6 @@
 # Rapport de vérification — S25-01
 
-Dernière phase locale : [S25-08 — présentation et releases](#s25-08--présentation-et-releases-11-octobre-2026).
+Dernière phase locale : [S25-10 — contrôle de tout le push](#s25-10--contrôle-de-tout-le-push-11-octobre-2026).
 Les sections précédentes conservent leur état historique.
 
 État constaté le **10 octobre 2026**, à la fin de la phase PATCH et avant le
@@ -739,3 +739,131 @@ mypy --strict — Success: no issues found in 4 source files
 Prochaine frontière NORMAL : un seul commit atomique
 `feat: add versioned Seedance releases` portant les treize fichiers
 suivis annoncés ci-dessus. Le scope ignoré reste exclu. Aucun push avec ce gate.
+
+## S25-10 — contrôle de tout le push (11 octobre 2026)
+
+Contrat **NORMAL**. Autorisation directe : `GO PATCH S25-10`, items **I18,
+I19 et I20**. Le plan couvre le correctif et son rapport ; I20 autorise ensuite
+l'intégration de cette même PR et sa première publication automatique, après
+les gates COMMIT et DRAFT PR sur le résultat corrigé. Les anciens GO COMMIT et
+DRAFT PR ne sont pas réutilisés pour un nouveau lot.
+
+Worktree : `/home/mmmpr/src/seedance-2-5`. Branche :
+`bootstrap/seedance-2-5`. HEAD avant et après le patch local :
+`ded5ce3027cfa3570016ed32058aaba695df5515`. La PR concernée est
+[MMMProd-Org/seedance-2-5 #3](https://github.com/MMMProd-Org/seedance-2-5/pull/3).
+Cette section décrit un patch non commité ; elle ne prouve pas sa publication.
+La ligne de navigation en tête du rapport est actualisée ; les comptes rendus
+des phases antérieures conservent leur état historique.
+
+### Cause établie et correction
+
+Au HEAD initial, `.github/workflows/check.yml:34` transmettait une base vide
+sur les pushes. `scripts/release_skill.py:218` utilisait alors le premier
+parent de HEAD, et `scripts/release_skill.py:296` publiait sans base explicite.
+Un commit de documentation placé après un changement du paquet pouvait ainsi
+masquer ce changement au contrôle de version. Le constat de review est une
+donnée : la preuve locale repose sur de vrais historiques Git temporaires et
+une publication simulée, pas sur l'autorité du bot.
+
+Deux cas discriminants fixés avant exécution ont été ajoutés : baisse de
+1.0.0 vers 0.9.0, puis changement du paquet sans hausse de 1.0.0, chacun suivi
+d'un commit README, avec le tag ciblé absent. Avant correction, les deux
+publications étaient acceptées à tort ; leurs nouveaux tests échouaient.
+Le contrôle avec la base complète
+refusait déjà ces deux historiques. Le témoin 1.0.0 vers 1.1.0 reste accepté.
+
+Le workflow fournit maintenant `github.event.before` aux deux jobs sur un
+push et conserve la base complète des PR. Le publisher exige `BASE_SHA` et
+valide toute la plage avant d'appeler GitHub. Une base absente, vide, mal formée
+ou inconnue échoue avant toute écriture. Le SHA composé de quarante zéros est
+traité explicitement comme une initialisation sans référence précédente ; il
+ne sert pas de valeur par défaut à une variable manquante.
+
+Le défaut concerne les futurs pushes de plusieurs commits. Il ne démontre pas
+que le squash initial d'un seul commit aurait publié une version incorrecte.
+Le mode local `--check` conserve le premier parent par défaut pour un commit ;
+la comparaison d'une plage demande `--base`. Aucun flag ou signature Python
+n'est ajouté ; le contrat d'environnement du publisher est corrigé.
+
+### Fichiers du lot
+
+| Fichier | Modification |
+| --- | --- |
+| `.github/workflows/check.yml` | Base d'avant le push dans le contrôle et la publication ; base des PR conservée |
+| `scripts/release_skill.py` | Base obligatoire avant publication et initialisation explicite sans référence précédente ; aide CLI actualisée |
+| `tests/test_release_skill.py` | Cinq tests ajoutés ; seules les données de base de la fixture et sa préparation de commit sont adaptées |
+| `docs/releasing.md` | Portée du contrôle pour plusieurs commits et contrat de publication documentés |
+| `docs/verification.md` | Rapport de ce correctif et navigation vers la dernière phase |
+
+`.session-scope.json`, ignoré, consigne l'autorisation directe et les conditions
+d'I20. Il ne constitue pas une autorisation et ne fait pas partie du commit.
+Les appels recensés sont le workflow, le point d'entrée CLI et les fixtures de
+tests ; ils sont traités dans ces cinq fichiers. Les propositions de workflow
+et de script ne remplacent pas les consignes AGENTS.md et CLAUDE.md de la base.
+
+### Vérifications exécutées
+
+Budget fixé avant exécution : mêmes cas déterministes avant/après, aucune
+relance jusqu'au premier vert. Le formatage signalé sur les ajouts de tests
+a été appliqué ; les contrôles finaux portent sur ces fichiers formatés et
+sur le rapport complété. Aucun job CI n'est relancé pour obtenir un vert.
+
+| Commande ou contrôle | Résultat | Classe |
+| --- | --- | --- |
+| `python3 -B -m unittest discover -s tests -p test_release_skill.py -v` avant correction | 29 méthodes ; les 24 méthodes existantes passent et le témoin avec hausse passe ; 6 échecs d'assertion, dont 4 sous-cas de base, et 1 erreur d'initialisation attendus ; exit 1 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B -m unittest discover -s tests -v` | 48/48, Python 3.14.3 | EXÉCUTÉ_CONCLUANT |
+| `/usr/bin/python3 -B -m unittest discover -s tests -v` | 48/48, Python 3.12.3 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/package_skill.py --check` | 30 fichiers source ; 77 liens locaux ; les deux archives vérifiées | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/release_skill.py --check --base 7329444a2652a35741497c2299f87e875a7aa7f2` | 1.0.0, sans publication | EXÉCUTÉ_CONCLUANT |
+| `ruff check --no-cache scripts/release_skill.py tests/test_release_skill.py` | All checks passed! | EXÉCUTÉ_CONCLUANT |
+| `ruff format --check --no-cache scripts/release_skill.py tests/test_release_skill.py` | 2 files already formatted, après la correction du format signalé | EXÉCUTÉ_CONCLUANT |
+| `mypy --strict --cache-dir /tmp/seedance-S25-10-mypy-cache scripts/release_skill.py tests/test_release_skill.py` | Success: no issues found in 2 source files | EXÉCUTÉ_CONCLUANT |
+| Parseur YAML installé, via Node, et comparaison de la structure avant/après | Exactement deux champs BASE_SHA changés ; guards, permissions, concurrence, actions figées, historique Git complet et checkout du SHA conservés | EXÉCUTÉ_CONCLUANT |
+| Comparaison AST des tests et SHA-256 des fichiers suivis au snapshot initial | 43 corps de tests existants conservés ; cinq méthodes ajoutées ; aucune modification hors des cinq chemins suivis autorisés | EXÉCUTÉ_CONCLUANT |
+
+Les nouveaux tests couvrent le refus des deux historiques invalides avant la
+première écriture simulée, le témoin avec hausse, les quatre entrées de base
+incorrectes et l'initialisation explicite. Les tests existants couvrent aussi
+documentation seule, base complète d'une PR, reprise de brouillon, collisions
+de tag, contenus d'assets, interruptions, permissions et contexte Actions.
+Cette couverture est limitée au harnais local et à ses cas ; elle ne prouve
+pas une absence générale de régression ni une publication GitHub réelle.
+
+Les 30 fichiers sous `skills/seedance-2-5/`, VERSION **1.0.0**, les deux README,
+la bannière et les deux archives restent identiques au HEAD initial. Chaque
+archive fait **419 620 octets**, SHA-256
+`4a99dd7a593fe468663d35f18325d9617f8084b119d284dff41ca62b9c32d51b`.
+Les fichiers suivis hors des cinq chemins du lot sont comparés par SHA-256.
+
+La relecture de `gh pr view 3 --repo MMMProd-Org/seedance-2-5 --json
+number,state,isDraft,headRefOid,baseRefOid,mergeCommit,reviewDecision,
+reviewRequests,statusCheckRollup,reviews,comments` montre encore une PR ouverte,
+prête et non fusionnée, au HEAD initial ded5ce3 et à la base
+7329444a2652a35741497c2299f87e875a7aa7f2. Les checks de cet ancien HEAD sont verts,
+les jobs de publication ignorés, Codex Completed et Copilot COMMENTED avec le
+constat reproduit. Les lectures de début et de fin contiennent le même
+commentaire Codex et la même review Copilot.
+Ces résultats distants ne valident pas encore le correctif local.
+
+### NON VÉRIFIÉ, risques et prochaine frontière
+
+**NON VÉRIFIÉ / NON_EXÉCUTÉ** : CI du futur HEAD corrigé, fusion, premier
+déclenchement réel de publication, tag et release publics v1.0.0, comportement
+API/latest et téléchargements publics. Ces preuves seront recueillies sous I20
+après les gates COMMIT et DRAFT PR. Imports Claude/Codex et qualité vidéo
+restent non testés. Actionlint est indisponible ; le YAML a été validé avec le
+parseur installé, sans ajout de dépendance.
+
+Risque restant : une base mal transmise bloque une publication légitime avant
+écriture ; les témoins valides et le contrôle des deux champs du workflow
+couvrent ce chemin localement. Une erreur API distante peut laisser un
+brouillon ; les reprises sont testées, sans suppression ni remplacement.
+Les limites du contenu du skill déjà listées dans les phases antérieures sont
+hors périmètre de ce correctif et ne sont pas réévaluées ici.
+
+Prochaine frontière, consigne utilisateur V6.5, MODE NORMAL, section COMMIT :
+un seul commit atomique **`fix: validate the full push before releasing`**,
+portant exactement les cinq fichiers suivis listés ci-dessus. Aucun push à
+cette frontière ; I20 attend ensuite le GO DRAFT PR sur le HEAD corrigé.
+**RÉPONDS : GO COMMIT**.

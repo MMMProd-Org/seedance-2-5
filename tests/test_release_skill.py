@@ -102,6 +102,7 @@ class ReleaseSkillTests(unittest.TestCase):
             "GITHUB_REF": "refs/heads/main",
             "GITHUB_REPOSITORY": release_skill.REPOSITORY,
             "GITHUB_SHA": self.sha,
+            "BASE_SHA": "0" * 40,
         }
         self.github = FakeGitHub(self.root, self.sha)
 
@@ -115,6 +116,8 @@ class ReleaseSkillTests(unittest.TestCase):
         )
 
     def commit(self) -> None:
+        if hasattr(self, "environment"):
+            self.environment["BASE_SHA"] = self.git("rev-parse", "HEAD")
         self.git(
             "add", "LICENSE", "README.md", "README.fr.md", "docs", "skills", "downloads"
         )
@@ -199,6 +202,68 @@ class ReleaseSkillTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "backwards"):
             self.publish()
         self.assertEqual(self.github.writes, [])
+
+    def test_lower_version_before_docs_commit_fails_before_writes(self) -> None:
+        (self.root / release_skill.VERSION_PATH).write_text("0.9.0\n")
+        package_skill.run(self.root, check=False)
+        self.commit()
+        (self.root / "README.md").write_text("# Improved documentation\n")
+        self.commit()
+        self.environment["GITHUB_SHA"] = self.git("rev-parse", "HEAD")
+        self.environment["BASE_SHA"] = self.sha
+        with self.assertRaisesRegex(ValueError, "backwards"):
+            release_skill.check_transition(self.root, self.sha)
+        with self.assertRaisesRegex(ValueError, "backwards"):
+            self.publish()
+        self.assertEqual(self.github.writes, [])
+
+    def test_changed_skill_before_docs_commit_requires_higher_version(self) -> None:
+        (self.root / "skills/seedance-2-5/assets/icon.svg").write_text(
+            "<svg>changed</svg>\n"
+        )
+        package_skill.run(self.root, check=False)
+        self.commit()
+        (self.root / "README.md").write_text("# Improved documentation\n")
+        self.commit()
+        self.environment["GITHUB_SHA"] = self.git("rev-parse", "HEAD")
+        self.environment["BASE_SHA"] = self.sha
+        with self.assertRaisesRegex(ValueError, "higher VERSION"):
+            release_skill.check_transition(self.root, self.sha)
+        with self.assertRaisesRegex(ValueError, "higher VERSION"):
+            self.publish()
+        self.assertEqual(self.github.writes, [])
+
+    def test_higher_version_before_docs_commit_can_publish(self) -> None:
+        (self.root / release_skill.VERSION_PATH).write_text("1.1.0\n")
+        package_skill.run(self.root, check=False)
+        self.commit()
+        (self.root / "README.md").write_text("# Improved documentation\n")
+        self.commit()
+        self.environment["GITHUB_SHA"] = self.git("rev-parse", "HEAD")
+        self.environment["BASE_SHA"] = self.sha
+        self.github.sha = self.environment["GITHUB_SHA"]
+        self.assertEqual(release_skill.check_transition(self.root, self.sha), "1.1.0")
+        self.assertIn("Published v1.1.0", self.publish())
+        self.assertEqual(self.github.tag_commit, self.environment["GITHUB_SHA"])
+
+    def test_publication_rejects_missing_empty_invalid_or_unknown_base(self) -> None:
+        for base in (None, "", "--invalid", "f" * 40):
+            with self.subTest(base=base):
+                environment = self.environment.copy()
+                if base is None:
+                    environment.pop("BASE_SHA")
+                else:
+                    environment["BASE_SHA"] = base
+                github = FakeGitHub(self.root, self.sha)
+                error = RuntimeError if base == "f" * 40 else ValueError
+                with self.assertRaises(error):
+                    release_skill.publish(self.root, environment, github)
+                self.assertEqual(github.writes, [])
+
+    def test_initial_push_without_previous_ref_can_publish(self) -> None:
+        self.assertEqual(release_skill.check_transition(self.root, "0" * 40), "1.0.0")
+        self.assertIn("Published v1.0.0", self.publish())
+        self.assertEqual(self.github.tag_commit, self.sha)
 
     def test_higher_version_and_explicit_pr_base_are_accepted(self) -> None:
         (self.root / release_skill.VERSION_PATH).write_text("1.1.0\n")

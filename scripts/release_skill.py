@@ -215,6 +215,8 @@ class GitHub:
 def check_transition(root: Path, base: str | None = None) -> str:
     package_skill.run(root, check=True)
     version = package_skill.read_version(root)
+    if base == "0" * 40:
+        return version
     if not base:
         parents = git(root, "rev-list", "--parents", "-n", "1", "HEAD").split()
         base = parents[1] if len(parents) > 1 else None
@@ -293,7 +295,10 @@ def verify_assets(
 
 def publish(root: Path, environment: Mapping[str, str], github: GitHub) -> str:
     sha = checked_commit(root, environment)
-    version = check_transition(root)
+    base = environment.get("BASE_SHA", "")
+    if not base:
+        raise ValueError("Publication requires BASE_SHA from the push event")
+    version = check_transition(root, base)
     tag = f"v{version}"
     expected = expected_assets(root)
     release = github.release(tag)
@@ -368,7 +373,7 @@ def main() -> None:
     parser.add_argument(
         "--base",
         default="",
-        help="PR base commit SHA; otherwise use HEAD's first parent",
+        help="Comparison base commit SHA; otherwise use HEAD's first parent",
     )
     arguments = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
