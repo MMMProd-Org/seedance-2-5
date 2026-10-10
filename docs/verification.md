@@ -1,5 +1,8 @@
 # Rapport de vérification — S25-01
 
+Dernière phase locale : [S25-08 — présentation et releases](#s25-08--présentation-et-releases-11-octobre-2026).
+Les sections précédentes conservent leur état historique.
+
 État constaté le **10 octobre 2026**, à la fin de la phase PATCH et avant le
 premier commit. Ce rapport décrit cette phase ; il ne certifie aucune publication
 future. Autorisation : `GO PATCH S25-01`, items I1 à I4. Licence MIT choisie
@@ -587,3 +590,152 @@ une seule exécution :
 ```text
 OK: 29 source files; 58 local links; .skill and .zip checked
 ```
+
+## S25-08 — Présentation et releases, 11 octobre 2026
+
+Contrat **NORMAL**. Autorisation directe de l’utilisateur : **GO PATCH S25-08**,
+items **I13, I14, I15, I16**. Cette phase prépare le code et la configuration ;
+aucun commit, push, merge ou lancement manuel de release n’est autorisé ici.
+La permission contents: write du seul job publish est l’item explicite I15.
+
+### Cause établie et décision
+
+Avant ce patch, le paquet avait 29 entrées sans VERSION et le workflow exécutait
+uniquement les tests et la comparaison du paquet. Les liens de téléchargement
+des README pointaient sur main. Le numéro 2.5 identifiait le modèle, pas une
+distribution conservée. Le code lu avant modification et la photo locale
+S25-08 établissent cette absence ; elle n’est pas déduite d’un badge.
+
+La version du skill est maintenant **1.0.0**, enregistrée dans
+[VERSION](../skills/seedance-2-5/VERSION) et contrôlée par
+[parse_version](../scripts/package_skill.py#L16). Le test déterministe avant
+correction a produit sept échecs : absence de VERSION et six formes invalides
+acceptées. Les mêmes cas passent après correction, sans assouplir leurs assertions.
+
+La présentation reprend de Ponytail une bannière originale, une entrée courte,
+des badges et des exemples visibles. Les parcours Claude, Claude Code, Codex,
+Windows et WSL sont conservés. Le lien de release devient le téléchargement
+principal ; le lien direct vers le ZIP de main reste visible comme secours.
+Le bouton principal est du texte et fonctionne sans son hébergeur de badges.
+L’amélioration esthétique reste un jugement de design, pas une mesure.
+
+### Fichiers modifiés
+
+| Fichier | Changement |
+| --- | --- |
+| [README.md](../README.md) | Présentation anglaise, installations repliables, version, téléchargement et secours |
+| [README.fr.md](../README.fr.md) | Même présentation et parcours en français |
+| [assets/seedance-banner.svg](../assets/seedance-banner.svg) | Illustration originale avec titre et description accessibles |
+| [skills/seedance-2-5/VERSION](../skills/seedance-2-5/VERSION) | Source unique du numéro 1.0.0, ajoutée au dossier installé |
+| [scripts/package_skill.py](../scripts/package_skill.py) | Validation obligatoire de VERSION, contrat run et noms d’archives conservés |
+| [tests/test_package_skill.py](../tests/test_package_skill.py) | Trois tests de version ; fixture complétée ; seize tests antérieurs conservés |
+| [downloads/seedance-2-5.skill](../downloads/seedance-2-5.skill) | Archive reconstruite, ajout de VERSION |
+| [downloads/seedance-2-5.zip](../downloads/seedance-2-5.zip) | Mêmes octets que le fichier .skill |
+| [.github/workflows/check.yml](../.github/workflows/check.yml) | Contrôle du numéro et publication après les checks, sur main de cette Org |
+| [scripts/release_skill.py](../scripts/release_skill.py) | Harnais de contrôle, brouillon, fichiers, publication et preuve finale |
+| [tests/test_release_skill.py](../tests/test_release_skill.py) | Vingt-quatre tests de publication avec GitHub simulé et Git temporaire |
+| [docs/releasing.md](releasing.md) | Procédure de préparation, publication automatique et reprise d’une interruption |
+| docs/verification.md | Résultats et limites de cette phase |
+| .session-scope.json, ignoré | Périmètre des quatorze chemins et preuve du GO ; aucun staging |
+
+Les scripts et le workflow modifiés sont des propositions de gouvernance,
+pas une nouvelle autorisation. AGENTS.md et CLAUDE.md sont inchangés.
+Le scope ne remplace jamais une instruction de l’utilisateur.
+
+### Publication prévue par le code
+
+Le [contrôle de transition](../scripts/release_skill.py#L214) refuse un numéro
+en recul ou réutilisé après changement du skill ou des archives. Le contrôle
+local --check ne publie rien et n’appelle pas le réseau. Sur une PR, la base
+est fournie par le workflow ; sur main, la comparaison utilise le premier parent.
+
+Le [job publish](../.github/workflows/check.yml#L37) dépend du succès du job
+check. Il est réservé à un push sur main de MMMProd-Org/seedance-2-5, avec
+contents: write pour ce job seulement, le jeton natif et le checkout du SHA testé.
+La concurrence conserve les commits main distincts et sérialise par version.
+Aucune permission globale, dépendance ou nouveau secret n’est ajouté.
+
+Le [publisher](../scripts/release_skill.py#L293) prépare un brouillon ciblant ce
+commit, téléverse ZIP, .skill et SHA256SUMS, puis compare les fichiers téléchargés
+avant et après publication. Un tag seul ou un brouillon ne suffit pas à annoncer
+une publication. La demande utilise la politique native make_latest: legacy.
+Les tests prouvent cette demande, pas le choix distant effectivement effectué.
+
+Une release publique identique est contrôlée sans écriture. Un brouillon du
+même commit reprend uniquement les fichiers manquants. Un contenu contradictoire,
+une erreur de permission, un fichier incomplet ou un autre commit provoque un
+échec explicite ; aucun fichier ou tag existant n’est remplacé.
+
+### Vérifications exécutées
+
+| Commande ou contrôle | Résultat et couverture | Classe |
+| --- | --- | --- |
+| python3 -B -m unittest discover -s tests -p test_package_skill.py -v, avant correction | 19 tests, 7 échecs attendus : validation de VERSION absente | EXÉCUTÉ_CONCLUANT pour la reproduction |
+| python3 -B -m unittest discover -s tests -v, avant le dernier test sans écriture | 42 tests passent : 19 paquet, 23 publication ; aucune mutation GitHub | EXÉCUTÉ_CONCLUANT pour ces cas |
+| /usr/bin/python3 -B -m unittest discover -s tests -v | 43 tests passent sous Python 3.12.3, version majeure/mineure du workflow | EXÉCUTÉ_CONCLUANT pour ces cas |
+| python3 -B -m unittest discover -s tests -p test_release_skill.py -k never_changes -v | Contrôle de version sans changement des octets ni mtimes, index Git inclus, sur le dépôt temporaire | EXÉCUTÉ_CONCLUANT pour ce cas |
+| python3 -B scripts/package_skill.py | Deux archives reconstruites avec VERSION ; 30 sources | EXÉCUTÉ_CONCLUANT |
+| python3 -B scripts/package_skill.py --check, avant cet append | 30 sources, 60 liens locaux, archives conformes ; résultat final ci-dessous | EXÉCUTÉ_CONCLUANT |
+| python3 -B scripts/release_skill.py --check --base 7329444a2652a35741497c2299f87e875a7aa7f2 | 1.0.0 ; contrôle local sans publication | EXÉCUTÉ_CONCLUANT |
+| ruff check --no-cache, sur les quatre fichiers Python | All checks passed! | EXÉCUTÉ_CONCLUANT |
+| ruff format --no-cache --check, sur les mêmes fichiers | 4 files already formatted | EXÉCUTÉ_CONCLUANT |
+| mypy --strict --cache-dir /tmp/seedance-S25-08-mypy, sur les mêmes fichiers | Success: no issues found in 4 source files | EXÉCUTÉ_CONCLUANT |
+| Comparaison SHA-256 des 42 fichiers suivis initiaux | Les 29 anciennes sources du skill sont identiques ; aucun écart suivi hors périmètre | EXÉCUTÉ_CONCLUANT pour cette couverture |
+| Comparaison des arbres syntaxiques des seize tests antérieurs | Les seize corps de tests sont identiques | EXÉCUTÉ_CONCLUANT |
+| Inspection ZIP et .skill | 419620 octets chacun ; 30 entrées ; CRC valide ; VERSION = 1.0.0 | EXÉCUTÉ_CONCLUANT |
+| YAML 1.2 avec la bibliothèque yaml déjà installée | Syntaxe, dépendance des jobs, garde Org/main/push, permissions, concurrence et actions épinglées contrôlées | EXÉCUTÉ_CONCLUANT pour ces assertions ; aucun run Actions |
+| API Markdown GitHub, les deux README finaux | Deux rendus HTML, quatre blocs details chacun, lien texte et secours présents | EXÉCUTÉ_CONCLUANT sur le balisage |
+| Playwright installé, trois captures finales | Sombre anglais et clair français à 1100 px, sombre français à 390 px ; bannière chargée ; pas de dépassement de page, Codex ouvert compris | EXÉCUTÉ_CONCLUANT sur le rendu local |
+| GitHub.release et GitHub.tag_sha du nouveau harnais, lectures réelles de v1.0.0 | Release et tag absents, réponses traitées sans écriture | EXÉCUTÉ_CONCLUANT pour ces lectures |
+| gh api repos/MMMProd-Org/seedance-2-5/commits/main | main reste 7329444a2652a35741497c2299f87e875a7aa7f2 | EXÉCUTÉ_CONCLUANT pour cette lecture |
+| gh pr list --repo MMMProd-Org/seedance-2-5 --state open | Liste vide | EXÉCUTÉ_CONCLUANT pour cette lecture |
+
+SHA-256 identique des deux archives :
+4a99dd7a593fe468663d35f18325d9617f8084b119d284dff41ca62b9c32d51b.
+SKILL.md conserve 0aebf227b9d33cb3ef3e513b7e3b4539a5f1c4583de6131636ce576ff65f22bb.
+
+### NON VÉRIFIÉ, risques et hors périmètre
+
+- Publication réelle v1.0.0, téléversement/API en écriture, réception binaire
+  distante, sélection de latest et CI du nouveau patch : intégration future
+  nécessaire. Aucun tag, release ni mutation de PR n’a été exécuté ici.
+- Affichage public GitHub et badges distants : captures à CSS local ; images
+  externes bloquées pour ces captures. Les tentatives antérieures renvoyaient
+  HTTP 403, dont la cause n’est pas établie. Aucun badge vert fictif n’est ajouté.
+- actionlint n’est pas installé ; le contrôle YAML et les assertions locales
+  ne remplacent pas son analyse ni une exécution GitHub Actions.
+- Import réel Claude/Codex et qualité vidéo : non testés ; les vingt-trois guides
+  et les deux cas source restent hors périmètre. Les huit questions historiques
+  de S25-04 ne sont pas réauditées et ne sont pas déclarées résolues.
+
+Risques restants : la future publication écrit des tags/releases avec le jeton
+du job ; une erreur API peut laisser un brouillon. La reprise contrôlée et le
+téléchargement direct de secours limitent les conséquences. La configuration
+doit encore être intégrée et le résultat réel prouvé ; ce patch ne certifie
+aucune absence générale de régression dans les assistants ou le moteur vidéo.
+
+Le dépôt ciblé reste sur bootstrap/seedance-2-5 à
+31c8000eb404d1709426652b17199a0ed9a5fc66 ; l’index de ce dépôt est vide.
+Les commits créés par les fixtures de tests concernent uniquement leurs dépôts
+temporaires, pas ce dépôt. Le contrôle final et son résultat sont enregistrés
+après cet append.
+
+Contrôle final exécuté le 2026-10-10T22:57:40.577232+00:00, sorties 0 :
+
+```text
+python3 -B -m unittest discover -s tests -v
+Ran 43 tests — OK (Python 3.14.3)
+/usr/bin/python3 -B -m unittest discover -s tests -v
+Ran 43 tests — OK (Python 3.12.3)
+python3 -B scripts/package_skill.py --check
+OK: 30 source files; 77 local links; .skill and .zip checked
+python3 -B scripts/release_skill.py --check --base 7329444a2652a35741497c2299f87e875a7aa7f2
+1.0.0
+ruff check --no-cache — All checks passed!
+ruff format --no-cache --check — 4 files already formatted
+mypy --strict — Success: no issues found in 4 source files
+```
+
+Prochaine frontière NORMAL : un seul commit atomique
+`feat: add versioned Seedance releases` portant les treize fichiers
+suivis annoncés ci-dessus. Le scope ignoré reste exclu. Aucun push avec ce gate.

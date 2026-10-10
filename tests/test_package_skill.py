@@ -30,6 +30,7 @@ class PackageSkillTests(unittest.TestCase):
         )
         (self.root / "LICENSE").write_text("MIT License\n")
         (self.skill / "LICENSE").write_text("MIT License\n")
+        (self.skill / "VERSION").write_text("1.0.0\n")
         (self.root / "README.md").write_text(
             "[Download](downloads/seedance-2-5.zip?raw=true)\n"
             '<img src="skills/seedance-2-5/assets/icon.svg">\n'
@@ -94,6 +95,35 @@ class PackageSkillTests(unittest.TestCase):
         (self.skill / "references" / "guide.md").write_text("# Updated guide\n")
         with self.assertRaisesRegex(ValueError, "Rebuild"):
             self.package(check=True)
+
+    def test_missing_version_is_rejected_before_writing(self) -> None:
+        (self.skill / "VERSION").unlink()
+        with self.assertRaisesRegex(ValueError, "VERSION"):
+            self.package()
+        self.assertFalse((self.root / "downloads").exists())
+
+    def test_invalid_version_is_rejected_before_writing(self) -> None:
+        for version in [
+            "",
+            "1.0",
+            "v1.0.0\n",
+            "01.0.0\n",
+            "1.0.0-beta\n",
+            "1.0.0\nextra\n",
+        ]:
+            with self.subTest(version=version):
+                (self.skill / "VERSION").write_text(version)
+                with self.assertRaisesRegex(ValueError, "VERSION"):
+                    self.package()
+                self.assertFalse((self.root / "downloads").exists())
+
+    def test_version_is_embedded_in_both_archives(self) -> None:
+        self.package()
+        for suffix in [".skill", ".zip"]:
+            with zipfile.ZipFile(
+                self.root / "downloads" / f"seedance-2-5{suffix}"
+            ) as archive:
+                self.assertEqual(archive.read("seedance-2-5/VERSION"), b"1.0.0\n")
 
     def test_rejects_tampered_and_unsafe_archives(self) -> None:
         self.package()

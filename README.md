@@ -1,66 +1,47 @@
 <p align="center">
-  <img src="assets/seedance-banner.svg" width="100%" alt="Seedance 2.5. Give your scene a plan: action, camera, performance and continuity.">
+  <img src="assets/seedance-banner.svg" width="100%" alt="Seedance 2.5 — an original illustrated director's board.">
 </p>
 
 <h1 align="center">Seedance 2.5 Skill</h1>
 
 <p align="center">
-  <strong>Your idea. A clear prompt. A scene with intention.</strong><br>
-  A downloadable directing and prompt-writing skill for Claude and Codex.
+  <strong>You see the scene. Your assistant helps you direct it.</strong><br>
+  A directing skill that turns your idea into a video prompt.
 </p>
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip"><strong>Download ZIP</strong></a>
+  <a href="https://github.com/MMMProd-Org/seedance-2-5/releases"><img src="https://img.shields.io/github/v/release/MMMProd-Org/seedance-2-5?style=flat-square&amp;color=d1e987&amp;label=release" alt="Latest published release"></a>
+  <a href="https://github.com/MMMProd-Org/seedance-2-5/actions/workflows/check.yml"><img src="https://github.com/MMMProd-Org/seedance-2-5/actions/workflows/check.yml/badge.svg?branch=main" alt="Skill checks"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-d1e987?style=flat-square" alt="MIT license"></a>
+</p>
+
+<p align="center">
+  <strong><a href="https://github.com/MMMProd-Org/seedance-2-5/releases/latest/download/seedance-2-5.zip">↓ Download the skill (ZIP)</a></strong>
   &nbsp; · &nbsp;
-  <a href="https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill">Download .skill</a>
+  <a href="https://github.com/MMMProd-Org/seedance-2-5/releases/latest/download/seedance-2-5.skill">.skill</a>
   &nbsp; · &nbsp;
-  <a href="#install-in-a-few-steps">Install</a>
+  <a href="#your-first-prompt-in-a-few-steps">Install</a>
   &nbsp; · &nbsp;
   <a href="README.fr.md">Français</a>
-  &nbsp; · &nbsp;
-  <a href="LICENSE">MIT</a>
 </p>
+
+<p align="center"><sub>Claude recommended by the author. Also designed for Codex.</sub></p>
+
+Download unavailable? [Direct ZIP download](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip).
 
 ---
 
-You have a scene in mind: someone waiting, a camera following a car, a gesture
-that carries into the next shot. This skill helps your assistant turn that idea
-into a prompt with visible action, clear camera choices and consistent states.
+## Your first prompt, in a few steps
 
-It also gives you a way to discuss a disappointing result: describe what you
-expected, what appeared and which instruction mattered. Work from that evidence
-to choose the next correction.
-
-**Recommended host: Claude.** The author's best results have been with Claude.
-The same skill files can be installed in Codex. This repository does not include
-a controlled comparison between the two hosts.
-
-## What it helps you direct
-
-| Your scene needs… | The skill's guidance covers… |
-| --- | --- |
-| A readable shot | Framing, placement, lens choices, camera movement and lighting |
-| A person who feels present | Acting tasks, listening, dialogue and purposeful silence |
-| Action you can follow | Contacts, motion, cause and consequence, duels and mechanisms |
-| Several connected shots | Beats, cuts, object states and continuity |
-| References that keep their role | Character, location, look, voice and image anchoring |
-| A useful diagnosis | Missing, conflicting or ignored instructions, with the evidence kept separate |
-
-The skill writes text to paste into your video interface. You generate the video
-there, then bring back the result if you want help reviewing it.
-
-## Install in a few steps
-
-### Claude web or Desktop — the easiest start
-
-1. [Download the ZIP](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip). Keep it zipped.
+1. [Download the ZIP](https://github.com/MMMProd-Org/seedance-2-5/releases/latest/download/seedance-2-5.zip). Keep it zipped.
 2. In Claude, open **Customize → Skills → + Create skill → Upload a skill**.
 3. Upload the ZIP, enable the skill and start a conversation about your scene.
 
 If Skills is unavailable, check Claude's code execution setting or your
 organization's settings. [Official installation guide](https://support.claude.com/en/articles/12512180-use-skills-in-claude).
 
-### Claude Code
+<details>
+<summary><strong>Claude Code</strong></summary>
 
 Download and extract the ZIP. Put the whole `seedance-2-5` folder in your personal
 skills directory:
@@ -70,7 +51,7 @@ skills directory:
 | Linux, macOS or WSL | `~/.claude/skills/seedance-2-5/` |
 | Native Windows | `%USERPROFILE%\.claude\skills\seedance-2-5\` |
 
-`SKILL.md`, `references/`, `assets/`, `agents/` and `LICENSE` must stay together.
+`SKILL.md`, `references/`, `assets/`, `agents/`, `VERSION` and `LICENSE` must stay together.
 Open Claude Code and invoke the skill:
 
 ```text
@@ -79,7 +60,10 @@ Open Claude Code and invoke the skill:
 
 [Official Claude Code skill guide](https://code.claude.com/docs/en/skills).
 
-### Codex
+</details>
+
+<details>
+<summary><strong>Codex</strong></summary>
 
 Download and extract the same ZIP. Put the whole `seedance-2-5` folder in your
 personal skills directory:
@@ -104,7 +88,17 @@ Restart Codex if the new skill does not appear.
 The `.skill` download contains the same ZIP data. For Claude's documented upload
 path, use the file ending in `.zip`.
 
-## Try it with your scene
+</details>
+
+## One idea. Clear directing choices.
+
+“A woman waits outside a glass entrance.” An example brief to give your assistant:
+
+| Your intention | A concrete direction |
+| --- | --- |
+| A restrained wait | Hands together, one released breath, no one arrives |
+| A frame that holds | One locked medium shot, six seconds, no cuts |
+| A consistent scene | The door stays closed; the character stays in place |
 
 **A quiet moment, with no references needed**
 
@@ -137,6 +131,20 @@ Tell the assistant your intended duration, aspect ratio, action and references.
 You can ask in your preferred language and choose the final prompt's language.
 Prompt text defaults to English when no language or existing prompt sets it.
 
+## What it helps you direct
+
+| Your scene needs… | The skill's guidance covers… |
+| --- | --- |
+| A readable shot | Framing, placement, lens choices, camera movement and lighting |
+| A person who feels present | Acting tasks, listening, dialogue and purposeful silence |
+| Action you can follow | Contacts, motion, cause and consequence, duels and mechanisms |
+| Several connected shots | Beats, cuts, object states and continuity |
+| References that keep their role | Character, location, look, voice and image anchoring |
+| A useful diagnosis | Missing, conflicting or ignored instructions, with the evidence kept separate |
+
+The skill writes text to paste into your video interface. You generate the video
+there, then bring back the result if you want help reviewing it.
+
 ## What you receive
 
 The skill's full delivery format calls for a duration, a text self-check, one
@@ -150,7 +158,20 @@ There are also two complete prompt cases in
 [the examples folder](skills/seedance-2-5/assets/cases/). They are text examples;
 this repository does not include generated clips or their reference images.
 
-## Inside the download
+## Which version do you have?
+
+**2.5 identifies the target model. The skill has its own version number.**
+Open `VERSION` in your installed skill folder to see your exact version.
+
+- [Latest release](https://github.com/MMMProd-Org/seedance-2-5/releases/latest): downloads and a summary of changes.
+- [All versions](https://github.com/MMMProd-Org/seedance-2-5/releases): find an earlier download.
+- `SHA256SUMS`, included in each release, lets you verify the downloaded files.
+
+The ZIP is recommended for Claude's upload flow. The `.skill` file contains the same data.
+Save your current skill folder before updating.
+
+<details>
+<summary><strong>Inside the download</strong></summary>
 
 ```text
 seedance-2-5/
@@ -158,6 +179,7 @@ seedance-2-5/
 ├── references/          23 focused guides
 ├── agents/openai.yaml   Codex presentation metadata
 ├── assets/              Icon and two text cases
+├── VERSION              Installed skill version
 └── LICENSE              MIT license
 ```
 
@@ -165,13 +187,10 @@ The guides cover shot writing, performance, physics, references, sequences,
 diagnosis, syntax, constraints and delivery. The assistant is instructed to open
 the guides relevant to the current scene.
 
-**2.5 identifies the skill's target model.** It is not a repository release number.
-Video capabilities and available settings depend on the interface you use.
-The assistant's self-check concerns the prompt text; generated footage still
-needs to be viewed. Host imports and video quality have not been tested during
-this bootstrap. See the [verification report](docs/verification.md).
+</details>
 
-## For maintainers
+<details>
+<summary><strong>For maintainers</strong></summary>
 
 The editable source is [skills/seedance-2-5/](skills/seedance-2-5/). Both download
 files are built from it with Python's standard library. To rebuild and check:
@@ -186,6 +205,12 @@ The checks cover local links, required metadata, license inclusion, safe paths
 and source/archive equality. Tests use temporary directories. CI runs the same
 tests and read-only package check. Shared development rules are in
 [AGENTS.md](AGENTS.md), with [CLAUDE.md](CLAUDE.md) pointing to them.
+
+</details>
+
+[Automated releases](docs/releasing.md): change the skill version in a PR. Checks pass; merging into main publishes the release.
+
+Package tests do not attest Claude/Codex imports or video quality. [Verification report](docs/verification.md).
 
 Have a case to improve? [Open an issue](https://github.com/MMMProd-Org/seedance-2-5/issues)
 with your brief, prompt and the result you observed.
