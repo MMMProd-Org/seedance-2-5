@@ -190,3 +190,103 @@ merge, release, déploiement ni cleanup implicite.
 - [Anthropic, skills Claude Code](https://code.claude.com/docs/en/skills), consulté le 10 octobre 2026.
 - [OpenAI, skills Codex](https://learn.chatgpt.com/docs/build-skills), consulté le 10 octobre 2026.
 - [Dietrich Gebert, Ponytail](https://github.com/DietrichGebert/ponytail), inspiration de présentation ; README consulté au commit `9b58c1ffb790c075ca32e70a89cf1d80588f4abf`. Aucun chiffre de benchmark ni image de Ponytail n’a été repris.
+
+
+---
+
+## Publication GitHub — constat du 10 octobre 2026
+
+Autorisation : `GO DRAFT PR`. Les deux pushes normaux et la création de la
+Draft PR ont été exécutés. Aucun merge, sortie de Draft, release ou cleanup.
+
+### État publié et preuves
+
+- Dépôt public : [mmmprod/seedance-2-5](https://github.com/mmmprod/seedance-2-5).
+- [Draft PR #1](https://github.com/mmmprod/seedance-2-5/pull/1) : OPEN, `isDraft: true`, titre prévu, aucun label, 40 fichiers.
+- Branche : `bootstrap/seedance-2-5`, HEAD `e804680e51275e2dc9aad50f28726aafc36e98aa`.
+- Base : `main`, SHA `43d950dfaf4a6d7b4f79eb1a51d91dfbb0edd040`.
+- `git ls-remote --heads origin` retourne exactement ces deux refs et SHA.
+- `git status --porcelain --ignored=matching --untracked-files=all` : uniquement caches et état de session ignorés ; fichiers suivis propres.
+
+### Vérifications exécutées
+
+| Contrôle | Résultat | Classe et couverture |
+| --- | --- | --- |
+| `gh pr view 1 --repo mmmprod/seedance-2-5 --json ...` | Draft, base et HEAD exacts, 40 fichiers, labels vides | EXÉCUTÉ_CONCLUANT |
+| [CI push, run 38075713510](https://github.com/mmmprod/seedance-2-5/actions/runs/38075713510) | `success`, SHA exact ; logs : `Ran 10 tests` et `OK: 29 source files; 59 local links; .skill and .zip checked` | EXÉCUTÉ_CONCLUANT |
+| [CI pull_request, run 38075718508](https://github.com/mmmprod/seedance-2-5/actions/runs/38075718508) | Même résultat au même HEAD | EXÉCUTÉ_CONCLUANT |
+| GET des deux archives, des deux README et de la bannière via raw.githubusercontent.com au SHA publié | HTTP 200 et octets identiques aux cinq fichiers locaux | EXÉCUTÉ_CONCLUANT |
+| Contrôle ZIP des archives téléchargées | 419 506 octets chacune, 29 entrées, CRC valide | EXÉCUTÉ_CONCLUANT |
+| Chromium headless sur la page GitHub de la branche, capture examinée | Bannière, titre, introduction, boutons et première table visibles | EXÉCUTÉ_CONCLUANT pour cette fenêtre 1440 × 2200, pas pour toutes les tailles |
+| Lecture des commentaires et reviews de la PR | `reviews: []` ; CodeRabbit : `Draft PR not reviewed` | EXÉCUTÉ_CONCLUANT pour le skip observé, pas une revue réussie |
+
+SHA-256 commun des deux archives publiques :
+`d5e2d8aee7ac26126dfa60e6027fcfd8705608bc39f216c8547be8b8ff5839f1`.
+
+La capture locale est `/tmp/seedance-s25-github-readme.png`. Elle ne constitue
+pas un fichier publié dans le dépôt.
+
+### Écart bloquant pour le téléchargement depuis les boutons
+
+Le DOM GitHub confirme que les liens de `README.md:13`, `README.md:15`,
+`README.md:56` et leurs équivalents `README.fr.md:13`, `README.fr.md:15`,
+`README.fr.md:57` passent par `/blob/<référence>/...` et `?raw=true`.
+
+Deux campagnes discriminantes de quatre routes ont été fixées avant chaque
+exécution, avec un seul GET par route, sans relance jusqu'au premier vert :
+
+| Route observée | Résultat |
+| --- | --- |
+| Les deux boutons réels, référence `bootstrap/seedance-2-5` | HTTP 503, page d'erreur GitHub, en-tête `Server: github.com` et identifiant de requête GitHub |
+| Même ZIP via `/blob/e804680…/…?raw=true` | HTTP 200, redirection vers le service brut, mêmes octets |
+| Même ZIP via raw.githubusercontent.com avec `/refs/heads/bootstrap/seedance-2-5/…` | HTTP 200, mêmes octets |
+| Même `LICENSE` via `/blob/bootstrap/seedance-2-5/…?raw=true` et `/blob/main/…?raw=true` | HTTP 503 dans les deux cas |
+| Page du ZIP via `/blob/bootstrap/seedance-2-5/…`, sans requête raw | HTTP 503 |
+| ZIP via GitHub `/raw/refs/heads/bootstrap/seedance-2-5/…` | HTTP 200, mêmes octets |
+
+Ces GET prouvent les réponses observées. La comparaison avec `main` réfute
+l'hypothèse que le slash du nom de branche suffit à expliquer l'erreur ; la
+page sans requête raw réfute aussi une explication limitée à `?raw=true`.
+La cause interne du service GitHub est **NON TRANCHÉE** : ses logs ne sont pas
+accessibles. Aucun défaut de contenu de l'archive n'est établi.
+
+
+### Adresses de distribution
+
+Les liens de téléchargement ciblent directement le service brut de la branche
+`main`. Les archives ne sont pas encore sur cette branche au constat ci-dessus.
+Le contrôle final sera deux GET, un par archive, après une fusion autorisée :
+HTTP 200, CRC valide et octets exacts. Ce contrôle reste NON EXÉCUTÉ.
+
+Imports Claude/Codex, vidéos et review CodeRabbit restent NON VÉRIFIÉS.
+
+## Patch S25-03 — application locale
+
+Autorisation reçue : `GO PATCH S25-03`, ITEM I6. Les trois changements locaux
+sont les six URL des deux README et les preuves ajoutées à ce rapport. Les
+URL ciblent désormais le service brut et la distribution de `main` ; elles
+ne passent plus par le visualiseur `/blob/`.
+
+| Vérification exécutée | Résultat | Classe et limite |
+| --- | --- | --- |
+| `python3 -B scripts/package_skill.py --check` | 29 sources, 53 liens locaux, deux archives conformes | EXÉCUTÉ_CONCLUANT pour la structure et les chemins locaux |
+| Comparaison des deux README à `git show HEAD:<fichier>` | Exactement trois remplacements par README ; aucun autre texte changé | EXÉCUTÉ_CONCLUANT |
+| Comparaison à l'archive Windows et contrôle SHA-256 | Les 28 fichiers originaux et le fichier fourni sont inchangés | EXÉCUTÉ_CONCLUANT |
+| SHA-256 et CRC des deux téléchargements locaux | SHA-256 approuvé conservé, 29 entrées ZIP valides par archive | EXÉCUTÉ_CONCLUANT |
+| `git diff --name-only` et `git diff --check` | Exactement `README.md`, `README.fr.md`, `docs/verification.md` ; aucun diagnostic d'espacement | EXÉCUTÉ_CONCLUANT |
+
+Les six liens devenus externes expliquent le passage de 59 à 53 chemins locaux
+contrôlés. Le script ne vérifie pas la disponibilité HTTP de ces nouveaux liens.
+Tests unitaires, lint et vérification des types : **NON_EXÉCUTÉ** pour ce patch
+documentaire ; aucun fichier Python, test ou workflow n'est modifié.
+
+Le self-audit distingue la modification des adresses, **PROUVÉE** par le diff,
+de leur disponibilité future sur `main`, **NON VÉRIFIÉE** avant fusion. Il
+conserve la cause interne GitHub comme **NON TRANCHÉE** et ne conclut pas à une
+correction du service GitHub ni à une absence universelle de régression.
+
+Lot proposé : un commit `docs: use direct archive download URLs`, contenant
+uniquement les trois documents nommés. Aucun staging, commit ou push exécuté
+pour ce patch. Il attend `GO COMMIT`. Le contrôle HTTP final des deux archives
+reste NON EXÉCUTÉ, avec le risque de liens indisponibles tant que `main` ne
+contient pas les téléchargements.

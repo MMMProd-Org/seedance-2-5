@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="downloads/seedance-2-5.zip?raw=true"><strong>Download ZIP</strong></a>
+  <a href="https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip"><strong>Download ZIP</strong></a>
   &nbsp; · &nbsp;
-  <a href="downloads/seedance-2-5.skill?raw=true">Download .skill</a>
+  <a href="https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill">Download .skill</a>
   &nbsp; · &nbsp;
   <a href="#install-in-a-few-steps">Install</a>
   &nbsp; · &nbsp;
@@ -53,7 +53,7 @@ there, then bring back the result if you want help reviewing it.
 
 ### Claude web or Desktop — the easiest start
 
-1. [Download the ZIP](downloads/seedance-2-5.zip?raw=true). Keep it zipped.
+1. [Download the ZIP](https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip). Keep it zipped.
 2. In Claude, open **Customize → Skills → + Create skill → Upload a skill**.
 3. Upload the ZIP, enable the skill and start a conversation about your scene.
 

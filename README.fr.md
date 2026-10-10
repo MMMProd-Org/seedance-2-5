@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="downloads/seedance-2-5.zip?raw=true"><strong>Télécharger le ZIP</strong></a>
+  <a href="https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip"><strong>Télécharger le ZIP</strong></a>
   &nbsp; · &nbsp;
-  <a href="downloads/seedance-2-5.skill?raw=true">Télécharger le .skill</a>
+  <a href="https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill">Télécharger le .skill</a>
   &nbsp; · &nbsp;
   <a href="#installer-en-quelques-étapes">Installer</a>
   &nbsp; · &nbsp;
@@ -54,7 +54,7 @@ vidéo, puis vous pouvez rapporter le résultat pour l’examiner avec l’assis
 
 ### Claude web ou Desktop — pour démarrer facilement
 
-1. [Téléchargez le ZIP](downloads/seedance-2-5.zip?raw=true). Gardez-le compressé.
+1. [Téléchargez le ZIP](https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip). Gardez-le compressé.
 2. Dans Claude, ouvrez **Customize → Skills → + Create skill → Upload a skill**.
 3. Importez le ZIP, activez le skill et démarrez une conversation sur votre scène.
 
