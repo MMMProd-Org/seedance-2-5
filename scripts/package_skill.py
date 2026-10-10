@@ -25,8 +25,21 @@ def local_target(document: Path, target: str, boundary: Path) -> Path | None:
 
 def check_links(document: Path, boundary: Path) -> int:
     text = document.read_text(encoding="utf-8")
-    # shortcut: inline Markdown and HTML links only; extend if other forms appear.
-    targets = re.findall(r"!?\[[^\]\n]*\]\(([^)\s]+)(?:\s+[^)]*)?\)", text)
+    # shortcut: inline links without escapes; extend if other Markdown forms appear.
+    targets: list[str] = []
+    for link in re.finditer(r"!?\[[^\]\n]*\]\(", text):
+        start = end = link.end()
+        depth = 0
+        while end < len(text) and not text[end].isspace():
+            if text[end] == "(":
+                depth += 1
+            elif text[end] == ")":
+                if depth == 0:
+                    break
+                depth -= 1
+            end += 1
+        if depth == 0 and end > start and re.match(r"(?:\s+[^)]*)?\)", text[end:]):
+            targets.append(text[start:end])
     targets += re.findall(r"\b(?:href|src)=[\"']([^\"']+)[\"']", text)
     return sum(
         local_target(document, target, boundary) is not None for target in targets
@@ -80,10 +93,35 @@ def collect_source(root: Path) -> tuple[dict[str, bytes], int]:
         or files[f"{SKILL_NAME}/LICENSE"] != license_path.read_bytes()
     ):
         raise ValueError("License in skill must match repository LICENSE")
+    agent_metadata = files[f"{SKILL_NAME}/agents/openai.yaml"].decode("utf-8")
+    # shortcut: canonical policy.products block list; extend before changing YAML shape.
+    policy = re.search(
+        r"^policy:\n((?: +[^\n]*(?:\n|$))*)", agent_metadata, re.MULTILINE
+    )
+    if policy is not None:
+        products = re.search(
+            r"^  products:([^\n]*)(?:\n|$)((?:  - [^\n]*(?:\n|$))*)",
+            policy[1],
+            re.MULTILINE,
+        )
+        if products is not None:
+            if products[1].strip() or not products[2]:
+                raise ValueError(
+                    "Codex products must use the canonical YAML block list"
+                )
+            for line in products[2].splitlines():
+                product = line[4:].strip().strip("\"'")
+                if product not in {
+                    "chatgpt",
+                    "codex",
+                    "atlas",
+                    "CHATGPT",
+                    "CODEX",
+                    "ATLAS",
+                }:
+                    raise ValueError(f"Unsupported Codex product: {product}")
     icons = re.findall(
-        r"^\s+icon_(?:small|large):\s*(.+?)\s*$",
-        files[f"{SKILL_NAME}/agents/openai.yaml"].decode("utf-8"),
-        re.MULTILINE,
+        r"^\s+icon_(?:small|large):\s*(.+?)\s*$", agent_metadata, re.MULTILINE
     )
     for icon in icons:
         icon_path = local_target(

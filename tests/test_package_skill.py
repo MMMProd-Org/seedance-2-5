@@ -155,6 +155,75 @@ class PackageSkillTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "License"):
             self.package()
 
+    def test_rejects_unsupported_codex_products(self) -> None:
+        for product in ["api", "unknown-product"]:
+            with self.subTest(product=product):
+                (self.skill / "agents" / "openai.yaml").write_text(
+                    f"policy:\n  products:\n  - chatgpt\n  - {product}\n"
+                    "  - codex\n  - atlas\n  allow_implicit_invocation: true\n"
+                )
+                with self.assertRaisesRegex(ValueError, "product"):
+                    self.package()
+                self.assertFalse((self.root / "downloads").exists())
+
+    def test_accepts_supported_and_optional_codex_products(self) -> None:
+        self.package()
+        for products in [
+            ["chatgpt", "codex", "atlas"],
+            ["CHATGPT", "CODEX", "ATLAS"],
+            ["'chatgpt'", '"codex"', "atlas"],
+        ]:
+            with self.subTest(products=products):
+                (self.skill / "agents" / "openai.yaml").write_text(
+                    "policy:\n  products:\n"
+                    + "".join(f"  - {product}\n" for product in products)
+                    + "  allow_implicit_invocation: false\n"
+                )
+                self.package()
+                self.package(check=True)
+
+    def test_rejects_products_outside_supported_yaml_shape(self) -> None:
+        for products in ["  products: [api]\n", "  products:\n    - api\n"]:
+            with self.subTest(products=products):
+                (self.skill / "agents" / "openai.yaml").write_text(
+                    "policy:\n" + products
+                )
+                with self.assertRaisesRegex(ValueError, "product"):
+                    self.package()
+                self.assertFalse((self.root / "downloads").exists())
+
+    def test_accepts_complete_markdown_destinations_with_parentheses(self) -> None:
+        for name in ["guide(v2).md", "guide(v2(extra)).md"]:
+            with self.subTest(name=name):
+                (self.skill / "references" / name).write_text("# Guide\n")
+                self.write_skill()
+                with (self.skill / "SKILL.md").open("a") as document:
+                    document.write(f"[Version](references/{name})\n")
+                self.package()
+                self.package(check=True)
+
+    def test_rejects_missing_parenthesized_target_with_existing_prefix(self) -> None:
+        (self.skill / "references" / "missing(v2").write_text("# Prefix\n")
+        with (self.skill / "SKILL.md").open("a") as document:
+            document.write("[Missing](references/missing(v2).md)\n")
+        with self.assertRaisesRegex(ValueError, r"missing\(v2\)\.md"):
+            self.package()
+        self.assertFalse((self.root / "downloads").exists())
+
+    def test_preserves_supported_link_forms(self) -> None:
+        document = self.skill / "SKILL.md"
+        document.write_text(
+            "[First](references/guide.md)[Second](references/guide.md#section)\n"
+            '[Titled](references/guide.md "Guide")\n'
+            "[Angle](<references/guide.md>)\n"
+            "![Icon](assets/icon.svg 'Icon')\n"
+            "[External](https://example.com/page?q=(v2))\n"
+            '<a href="references/guide.md#part">Guide</a>\n'
+            '<img src="assets/icon.svg">\n'
+            "[Fragment](#heading)\n"
+        )
+        self.assertEqual(package_skill.check_links(document, self.skill), 7)
+
 
 if __name__ == "__main__":
     unittest.main()

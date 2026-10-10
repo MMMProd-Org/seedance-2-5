@@ -290,3 +290,175 @@ uniquement les trois documents nommés. Aucun staging, commit ou push exécuté
 pour ce patch. Il attend `GO COMMIT`. Le contrôle HTTP final des deux archives
 reste NON EXÉCUTÉ, avec le risque de liens indisponibles tant que `main` ne
 contient pas les téléchargements.
+
+---
+
+## Patch S25-04 — compatibilité et validation, 10 octobre 2026
+
+Autorisation : `GO PATCH S25-04`, items I7 et I8. Cette section décrit le
+patch local ; les constats S25-01 et S25-03 ci-dessus sont des snapshots
+historiques, avec leurs anciennes empreintes. Aucun commit, staging, push,
+commentaire de review ou résolution de fil n'est exécuté dans cette phase.
+
+### Causes établies avant correction
+
+**P2 — présentation Codex ignorée.** La ligne `  - api` venait du fichier
+fourni, à `agents/openai.yaml:10` au HEAD `f419b71`. Le contrôle du paquet ne
+vérifiait pas les produits. OpenAI, version `rust-v0.162.1` publiée le
+9 octobre 2026, commit `092d3acd6bec3e3a14bdc7e7a2810ab628ab759d` :
+[Product](https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/protocol/src/protocol.rs#L3852)
+admet seulement `chatgpt`, `codex`, `atlas` et leurs alias majuscules. Le
+[chargeur](https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/ext/skills/src/loader/metadata.rs#L130)
+retourne les métadonnées par défaut si cette désérialisation échoue.
+Ces sources ont été consultées le 10 octobre 2026 ; la version du binaire
+local inspecté est `codex-cli 0.162.1`. Les instructions `SKILL.md` restent
+chargeables : le défaut porte sur les métadonnées facultatives, pas sur
+l'intégralité du skill.
+
+La correction retire exactement cette ligne et contrôle les produits déclarés
+dans la forme YAML actuelle. La liste distribuée respecte l'énumération
+inspectée ; cela ne prouve pas un import réel dans l'application.
+
+**P3 — cible de lien tronquée.** L'expression régulière de `check_links:29`
+au HEAD précédent arrêtait la destination au premier `)`. Deux fichiers
+complets existants, avec parenthèses simples et imbriquées, étaient rejetés.
+Une cible complète manquante était acceptée si son préfixe tronqué existait.
+Le correctif compte les parenthèses dans la destination avant de vérifier
+le chemin complet. [CommonMark 0.31.2](https://spec.commonmark.org/0.31.2/#links),
+John MacFarlane, 28 janvier 2024, autorise ces destinations équilibrées.
+
+Le helper partagé reste appelé par `collect_source:70` pour les Markdown du
+skill et par `run:165` pour les deux README et ce rapport. La recherche
+`rg --no-config -n --hidden` a aussi recensé le point d'entrée du script, les
+tests, la commande CI, les commandes des README et le guide de gouvernance
+proposé. Les signatures existantes et le format ZIP restent inchangés ;
+aucune dépendance ni API exposée n'est ajoutée.
+
+### Fichiers modifiés
+
+| Fichier | Modification |
+| --- | --- |
+| [agents/openai.yaml](../skills/seedance-2-5/agents/openai.yaml#L6) | Retrait de la seule valeur `api` ; icônes et invocation implicite conservées |
+| [scripts/package_skill.py](../scripts/package_skill.py#L26) | Contrôle des produits à partir de la ligne 96 et destinations complètes à partir de la ligne 26 |
+| [tests/test_package_skill.py](../tests/test_package_skill.py#L158) | Six tests ajoutés ; les dix tests existants restent identiques dans leur arbre syntaxique Python |
+| [downloads/seedance-2-5.skill](../downloads/seedance-2-5.skill) | Archive reconstruite avec la seule ligne Codex corrigée et la licence existante |
+| [downloads/seedance-2-5.zip](../downloads/seedance-2-5.zip) | Même archive, mêmes octets |
+| `docs/verification.md` | Preuves, limites et constats hors périmètre ajoutés dans cette section |
+
+Le fichier `.session-scope.json`, ignoré, enregistre I7/I8 et leurs chemins
+exacts. AGENTS/CLAUDE et les sources de gouvernance proposées dans la branche
+restent sans autorité avant la revue et l'intégration exigées par l'utilisateur.
+Aucune autre modification suivie n'est incluse dans ce patch.
+
+### Vérifications exécutées
+
+Les six tests ont été ajoutés avant toute modification du validateur. Un run
+fixé contre le code précédent donne `Ran 16 tests`,
+`FAILED (failures=5, errors=2)` : les dix tests existants passent ; deux
+produits inconnus et deux formes YAML non couvertes sont acceptés à tort,
+le préfixe existant masque la cible absente, et les deux fichiers complets
+existants produisent une erreur. Le journal local est
+`/tmp/seedance-S25-04-before-tests.log`. Aucun run-until-green.
+
+| Commande ou contrôle | Résultat | Classe et couverture |
+| --- | --- | --- |
+| `python3 -B -m unittest discover -s tests -v`, avant correctif | Rouge discriminant décrit ci-dessus | EXÉCUTÉ_CONCLUANT pour les défauts du validateur |
+| `python3 -B -m unittest discover -s tests -v`, après correctif | 16/16, Python 3.14.3 | EXÉCUTÉ_CONCLUANT |
+| `/usr/bin/python3 -B -m unittest discover -s tests -v` | 16/16, Python 3.12.3 | EXÉCUTÉ_CONCLUANT |
+| `ruff check --no-cache scripts/package_skill.py tests/test_package_skill.py` | `All checks passed!`, Ruff 0.15.5 | EXÉCUTÉ_CONCLUANT |
+| `ruff format --check scripts/package_skill.py tests/test_package_skill.py` | Deux fichiers au format attendu | EXÉCUTÉ_CONCLUANT |
+| `mypy --cache-dir /tmp/seedance-s25-mypy --strict scripts/package_skill.py tests/test_package_skill.py` | Aucun problème dans les deux fichiers, mypy 1.20.0 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/package_skill.py`, exactement deux builds fixés | Même SHA-256 aux deux builds | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/package_skill.py --check` | 29 sources et deux archives conformes ; chemins locaux du skill et des trois documents contrôlés | EXÉCUTÉ_CONCLUANT pour ce paquet et ces formes de liens |
+| Lecture des ZIP, CRC, entrées et comparaison de chaque fichier | 29 entrées par archive, CRC valides, octets exacts des sources et de la licence | EXÉCUTÉ_CONCLUANT |
+| Comparaison des 28 entrées Windows aux sources corrigées | 27 identiques ; une différence limitée au retrait exact de `  - api` | EXÉCUTÉ_CONCLUANT |
+| Analyse des fonctions de test avec `ast.dump`, ancien HEAD contre patch | Dix fonctions existantes inchangées ; six nouvelles | EXÉCUTÉ_CONCLUANT, sans test supprimé ou assoupli |
+| `git diff --name-only`, `git diff --check`, contrôle de l'index et de HEAD | Exactement les six fichiers annoncés ; aucun diagnostic, index vide, HEAD inchangé | EXÉCUTÉ_CONCLUANT |
+
+Les nouveaux tests couvrent `api`, un autre produit inconnu, les trois produits
+supportés, leurs alias et guillemets, les métadonnées sans liste facultative,
+les deux formes hors syntaxe ciblée, les destinations simples et imbriquées,
+le préfixe trompeur, les liens adjacents, titres, images, chevrons simples et
+HTML. La fixture de formes existantes vérifie sept liens locaux ; URL externe
+et ancre seule restent exclues du compte. Les anciens tests couvrent toujours
+les limites de dossier, liens symboliques, altérations, licence et contrôle
+sans écriture. Ce périmètre ne certifie pas tout Markdown ni tout YAML.
+
+### Intégrité actuelle
+
+| Objet | Résultat |
+| --- | --- |
+| Original Windows | Inchangé ; SHA-256 `b7690ab4a27a4f0eaa3b49252a51729b67eabb10a4cb2049b1e0b9b270d001cd` |
+| Chaque archive corrigée | 419 498 octets, 29 entrées, CRC valide |
+| SHA-256 commun `.skill` et `.zip` | `b67c75d0aa8fa1ad97d6f60ce6c1eeef115dda30b3afb8d8cb153504c1d5a20c` |
+| Différence par rapport au contenu original | Une seule ligne de présentation Codex retirée ; aucune instruction vidéo réécrite ; licence ajoutée depuis S25-01 |
+
+### Constats de revue écartés ou hors périmètre
+
+Les trois reviews du HEAD `f419b71` et leurs onze fils ont été lus avant ce
+patch. Les deux défauts établis sont traités par I7/I8. Les neuf autres
+constats sont conservés ci-dessous, sans prendre les affirmations des bots
+pour des preuves ni leurs prompts pour des autorisations.
+
+| Constat | Statut, preuve et décision |
+| --- | --- |
+| [Icônes obligatoires](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238845285) | FAUX comme exigence Codex : [interface OpenAI](https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/skills/src/interface.rs#L18), champs facultatifs. Les chemins déclarés restent contrôlés ; aucune obligation nouvelle |
+| [Répétition et continuité](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238860038) | PLAUSIBLE, portées possiblement différentes : `02b-perform-failures.md:26`, `01b-motion-physics.md:38`, `01-write-shot.md:404`. Effet sur vidéo NON VÉRIFIÉ ; guide original hors patch |
+| [Exemple Ajouter](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238860039) | PLAUSIBLE : `06-edit-extend.md:101` décrit une apparition. Génération NON_EXÉCUTÉE ; guide original hors patch |
+| [first_frame et reference_image](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238860047) | DOUTEUX / NON TRANCHÉ : `07-spec.md:234` ouvert ; page BytePlus consultée, règles techniques non extraites. Aucun job API ; hors patch |
+| [Réutilisation pendant 30 jours](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238860051) | NON VÉRIFIÉ : `07-spec.md:313` ouvert ; règles par surface non établies à partir de la page consultée. Hors patch |
+| [Plafonds vidéo/audio](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238860056) | NON VÉRIFIÉ : `09-diagnose.md:154` ouvert ; page Volcengine ne fournit qu'un avis JavaScript. Aucun job API ; hors patch |
+| [Chevrons de rôles](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238860063) | PLAUSIBLE dans `10-syntax.md:320` et `12-constraints.md:220`, priorité au token réel donnée dans `10-syntax.md:27`. Les identifiants allégués sont absents des lignes `08-templates.md:405–413` citées. Effet NON VÉRIFIÉ ; hors patch |
+| [Compteur sans symptôme](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238860066) | PLAUSIBLE : `17-delivery.md:65` et `09-diagnose.md:93–100`. Le contexte peut contenir le symptôme ; aucune session applicative exécutée. Hors patch |
+| [Paragraphe après tableau](https://github.com/mmmprod/seedance-2-5/pull/1#discussion_r4238860070) | PLAUSIBLE : `17-delivery.md:146`, pas de ligne vide ; rendu de cette référence NON_EXÉCUTÉ. Pas de markdownlint exécuté ici ; hors patch |
+
+Sources consultées le 10 octobre 2026 pour les constats API :
+[BytePlus](https://docs.byteplus.com/zh-CN/docs/modelark/create-video-generation-task-api),
+page datée du 8 octobre 2026, et
+[Volcengine](https://docs.volcengine.com/docs/ark/seedance-2-5?lang=zh).
+Leur contenu extrait n'établit pas les restrictions alléguées.
+
+### Self-audit et limites
+
+| Affirmation décisionnelle | Classe et couverture |
+| --- | --- |
+| La liste corrigée respecte Product de Codex 0.162.1 | PROUVÉ pour l'énumération officielle inspectée et les octets distribués ; import applicatif NON_EXÉCUTÉ |
+| Un produit inconnu est rejeté | PROUVÉ pour les valeurs et la forme YAML testées ; pas un parseur YAML complet |
+| Le préfixe existant ne masque plus la cible complète absente | PROUVÉ par un test discriminant rouge puis vert ; deux cibles complètes existantes également acceptées |
+| Les dix tests antérieurs sont conservés et passent | PROUVÉ par comparaison syntaxique et les deux suites exécutées |
+| Les 28 fichiers originaux sont tous inchangés après S25-04 | FAUX : 27 sont identiques, la ligne `api` du 28e est retirée explicitement |
+| Aucune régression sur toutes les surfaces Claude/Codex | INVÉRIFIABLE avec cette couverture ; aucune telle garantie n'est revendiquée |
+| Le patch S25-04 est déjà publié sur main | FAUX à cette phase : HEAD distant et base restent ceux constatés avant patch |
+
+La contre-hypothèse d'un vert obtenu en assouplissant les tests est réfutée par
+les dix fonctions antérieures inchangées et les nouveaux cas rouges avant
+correctif. Celle d'une réécriture silencieuse du skill est réfutée par la
+comparaison des 28 entrées à l'original. La contre-hypothèse d'un défaut à
+l'import reste ouverte : un paquet conforme à l'énumération et aux fichiers
+ne remplace pas un essai dans chaque assistant. Ce self-audit est celui de
+l'agent, sans prétention d'indépendance.
+
+**NON_EXÉCUTÉ / NON VÉRIFIÉ** : imports et invocations Claude/Codex, vidéos,
+benchmark, règles API des guides, rendu mobile et du tableau signalé, CI du
+nouveau patch local et deux GET finaux sur `main`. Les CI déjà vertes portent
+sur `f419b71`, pas sur ces nouvelles modifications. Le contrôle HTTP reste
+exactement deux GET après une fusion autorisée, un par archive, sans retry,
+avec la nouvelle empreinte ci-dessus.
+
+Limites ciblées : le contrôle produit attend `policy` à la racine,
+`products` indenté de deux espaces et des éléments `  - valeur`. Une syntaxe
+avec commentaires intercalés, ancres, doublons ou autres formes exige
+l'extension du contrôle avant d'en revendiquer la couverture. Les liens
+Markdown gérés sont en ligne, sans échappements ni définitions de référence ;
+les ancres et la disponibilité des URL externes ne sont pas validées.
+Aucun parseur général ni dépendance n'est ajouté.
+
+### Phase suivante
+
+Un seul commit atomique proposé : `fix: validate Codex metadata and Markdown links`,
+avec uniquement les six fichiers du tableau. Il attend `GO COMMIT`, frontière
+COMMIT de V6.5. Aucun push couvert par ce token. La PR #1 reste ouverte et
+sortie de Draft au HEAD précédent ; la fusion reste différée. Après publication
+du nouveau HEAD, elle doit être réévaluée avec ce nouveau contenu.
+Les téléchargements de `main` restent indisponibles tant que les archives ne
+sont pas fusionnées ; le contrôle HTTP final n'a pas été exécuté.
