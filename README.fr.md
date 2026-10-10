@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip"><strong>Télécharger le ZIP</strong></a>
+  <a href="https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip"><strong>Télécharger le ZIP</strong></a>
   &nbsp; · &nbsp;
-  <a href="https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill">Télécharger le .skill</a>
+  <a href="https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill">Télécharger le .skill</a>
   &nbsp; · &nbsp;
   <a href="#installer-en-quelques-étapes">Installer</a>
   &nbsp; · &nbsp;
@@ -54,7 +54,7 @@ vidéo, puis vous pouvez rapporter le résultat pour l’examiner avec l’assis
 
 ### Claude web ou Desktop — pour démarrer facilement
 
-1. [Téléchargez le ZIP](https://raw.githubusercontent.com/mmmprod/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip). Gardez-le compressé.
+1. [Téléchargez le ZIP](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip). Gardez-le compressé.
 2. Dans Claude, ouvrez **Customize → Skills → + Create skill → Upload a skill**.
 3. Importez le ZIP, activez le skill et démarrez une conversation sur votre scène.
 
@@ -191,7 +191,7 @@ des dossiers temporaires. La CI lance les mêmes tests et la vérification du
 paquet en lecture seule. Les règles de travail partagées sont dans
 [AGENTS.md](AGENTS.md), avec un renvoi depuis [CLAUDE.md](CLAUDE.md).
 
-Un cas à améliorer ? [Ouvrez une issue](https://github.com/mmmprod/seedance-2-5/issues)
+Un cas à améliorer ? [Ouvrez une issue](https://github.com/MMMProd-Org/seedance-2-5/issues)
 avec votre demande, le prompt et le résultat observé.
 
 Distribué sous [licence MIT](LICENSE). Présentation du README inspirée de
