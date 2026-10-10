@@ -1,0 +1,18 @@
+# Local session state, credentials and generated evidence
+.session-scope.json
+.env
+.env.*
+*.pem
+*.key
+.reports/
+
+# Agent overrides, caches and linked worktrees
+CLAUDE.local.md
+.claude/settings.local.json
+.codex/config.toml
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.mypy_cache/
+.venv/
+.worktrees/
