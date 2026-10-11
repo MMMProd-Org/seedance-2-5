@@ -12,6 +12,7 @@ import tempfile
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import quote
 
 import package_skill
 
@@ -76,6 +77,9 @@ class Release:
 
 def parse_release(value: object) -> Release:
     fields = object_fields(value)
+    release_id = number_field(fields, "id")
+    if release_id == 0:
+        raise ValueError("Invalid release ID")
     draft = fields.get("draft")
     raw_assets = fields.get("assets")
     if not isinstance(draft, bool) or not isinstance(raw_assets, list):
@@ -97,7 +101,7 @@ def parse_release(value: object) -> Release:
             )
         )
     return Release(
-        number_field(fields, "id"),
+        release_id,
         text_field(fields, "tag_name"),
         text_field(fields, "target_commitish"),
         draft,
@@ -130,6 +134,12 @@ class GitHub:
             raise ValueError("Duplicate release tag")
         return matches[0] if matches else None
 
+    def release_by_id(self, release_id: int) -> Release:
+        release = parse_release(self.api(f"repos/{REPOSITORY}/releases/{release_id}"))
+        if release.id != release_id:
+            raise ValueError("Release ID changed")
+        return release
+
     def tag_sha(self, tag: str) -> str | None:
         refs = self.api(f"repos/{REPOSITORY}/git/matching-refs/tags/{tag}")
         if not isinstance(refs, list):
@@ -157,32 +167,48 @@ class GitHub:
             annotated = object_fields(self.api(f"repos/{REPOSITORY}/git/tags/{sha}"))
             target = object_fields(annotated.get("object"))
 
-    def create(self, tag: str, sha: str, notes: Path) -> None:
-        command(
+    def create(self, tag: str, sha: str, notes: Path) -> Release:
+        response = command(
             [
                 "gh",
-                "release",
-                "create",
-                tag,
-                "--repo",
-                REPOSITORY,
-                "--target",
-                sha,
-                "--draft",
-                "--title",
-                f"Seedance skill {tag}",
-                "--generate-notes",
-                "--notes-file",
-                str(notes),
+                "api",
+                f"repos/{REPOSITORY}/releases",
+                "--method",
+                "POST",
+                "--input",
+                "-",
             ],
             self.root,
+            json.dumps(
+                {
+                    "tag_name": tag,
+                    "target_commitish": sha,
+                    "draft": True,
+                    "name": f"Seedance skill {tag}",
+                    "body": notes.read_text(encoding="utf-8"),
+                    "generate_release_notes": True,
+                }
+            ).encode(),
         )
+        return parse_release(json.loads(response))
 
-    def upload(self, tag: str, paths: list[Path]) -> None:
-        command(
-            ["gh", "release", "upload", tag, "--repo", REPOSITORY, *map(str, paths)],
-            self.root,
-        )
+    def upload(self, release: Release, paths: list[Path]) -> None:
+        for path in paths:
+            command(
+                [
+                    "gh",
+                    "api",
+                    f"https://uploads.github.com/repos/{REPOSITORY}/releases/"
+                    f"{release.id}/assets?name={quote(path.name, safe='')}",
+                    "--method",
+                    "POST",
+                    "-H",
+                    "Content-Type: application/octet-stream",
+                    "--input",
+                    str(path),
+                ],
+                self.root,
+            )
 
     def asset_bytes(self, asset: Asset) -> bytes:
         return command(
@@ -329,9 +355,10 @@ def publish(root: Path, environment: Mapping[str, str], github: GitHub) -> str:
                 "VERSION identifies the installed skill. SHA256SUMS verifies the downloads.\n",
                 encoding="utf-8",
             )
-            github.create(tag, sha, notes)
-            release = github.release(tag)
-        if release is None or not release.draft or release.target != sha:
+            release = github.create(tag, sha, notes)
+        else:
+            release = github.release_by_id(release.id)
+        if not release.draft or release.target != sha or release.tag != tag:
             raise ValueError("Expected draft for the checked commit")
         verify_assets(github, release, expected, complete=False)
         present = {asset.name for asset in release.assets}
@@ -342,13 +369,13 @@ def publish(root: Path, environment: Mapping[str, str], github: GitHub) -> str:
                 path.write_bytes(content)
                 missing.append(path)
         if missing:
-            github.upload(tag, missing)
-        uploaded = github.release(tag)
+            github.upload(release, missing)
+        uploaded = github.release_by_id(release.id)
         if (
-            uploaded is None
-            or not uploaded.draft
+            not uploaded.draft
             or uploaded.id != release.id
             or uploaded.target != sha
+            or uploaded.tag != tag
         ):
             raise ValueError("Draft changed during upload")
         verify_assets(github, uploaded, expected, complete=True)
@@ -356,8 +383,13 @@ def publish(root: Path, environment: Mapping[str, str], github: GitHub) -> str:
         if tag_sha is not None and tag_sha != sha:
             raise ValueError("Tag changed before publication")
         github.publish(uploaded)
-    published = github.release(tag)
-    if published is None or published.draft or published.id != release.id:
+    published = github.release_by_id(release.id)
+    if (
+        published.draft
+        or published.id != release.id
+        or published.target != sha
+        or published.tag != tag
+    ):
         raise ValueError("Release is not publicly published")
     if github.tag_sha(tag) != sha:
         raise ValueError("Published tag does not match the checked commit")

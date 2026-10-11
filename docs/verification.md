@@ -1,6 +1,6 @@
 # Rapport de vérification — S25-01
 
-Dernière phase locale : [S25-10 — contrôle de tout le push](#s25-10--contrôle-de-tout-le-push-11-octobre-2026).
+Dernière phase locale : [S25-11 — suivi de release par identifiant](#s25-11--suivi-de-release-par-identifiant-11-octobre-2026).
 Les sections précédentes conservent leur état historique.
 
 État constaté le **10 octobre 2026**, à la fin de la phase PATCH et avant le
@@ -866,4 +866,116 @@ Prochaine frontière, consigne utilisateur V6.5, MODE NORMAL, section COMMIT :
 un seul commit atomique **`fix: validate the full push before releasing`**,
 portant exactement les cinq fichiers suivis listés ci-dessus. Aucun push à
 cette frontière ; I20 attend ensuite le GO DRAFT PR sur le HEAD corrigé.
+**RÉPONDS : GO COMMIT**.
+
+## S25-11 — suivi de release par identifiant (11 octobre 2026)
+
+Autorisation directe : **GO PATCH S25-11**, ITEMS I21, I22, I23 et I24.
+Contrat **NORMAL**. Cette phase livre le correctif local ; I22 et I24 restent
+conditionnés aux gates COMMIT et DRAFT PR, puis à leurs preuves CI.
+
+### Cause établie et décision
+
+La [PR #3](https://github.com/MMMProd-Org/seedance-2-5/pull/3) a été fusionnée
+au SHA **1364274c16d64860862b9cc8b7bde224c1d1348b**. Le
+[run 38131401417](https://github.com/MMMProd-Org/seedance-2-5/actions/runs/38131401417)
+a passé ses contrôles, dont 48 tests, puis échoué dans le job publish avec
+« Expected draft for the checked commit ». Le brouillon **409590797** est
+resté vide, non publié, pour v1.0.0 et ce SHA.
+
+Dans l'ancien code, `scripts/release_skill.py:332` abandonnait la réponse de
+création, puis la ligne 333 recherchait le brouillon dans la liste globale.
+La même dépendance existait après upload et publication, lignes 346 et 359.
+Deux cas forcés démontrent le défaut local : une liste qui ne montre pas le
+brouillon créé ; puis une liste qui conserve l'état draft après publication.
+Avant correction, les tests échouent respectivement aux lignes 335 et 361.
+La réponse du job GitHub réel n'a pas été enregistrée : son contenu exact et
+l'origine d'un éventuel retard côté service restent **NON VÉRIFIÉS**.
+
+Le correctif conserve l'objet et l'identifiant de la réponse de création REST.
+Les envois et les lectures suivantes ciblent cet identifiant. Un brouillon
+retrouvé par version est relu par ID avant upload. Les contrôles du tag, de la
+cible, de l'état, des tailles et des octets restent actifs ; les ID incohérents
+et erreurs API échouent explicitement. Aucun délai ou retry n'est ajouté.
+Le refus d'un brouillon d'un autre commit reste en place, ligne 343.
+
+### Fichiers et préparation Git
+
+| Fichier | Modification |
+| --- | --- |
+| `scripts/release_skill.py` | Réponse de création conservée ; lecture et upload par ID ; identité contrôlée à chaque étape |
+| `tests/test_release_skill.py` | Neuf nouveaux tests ; double adapté ; assertions du transport REST mises à jour |
+| `docs/releasing.md` | Suivi par ID, distinction entre relance de l'ancien code et reprise après correctif, exception du seul brouillon vide |
+| `docs/verification.md` | Rapport de la phase et navigation actualisée |
+
+`.session-scope.json`, ignoré, consigne l'accord direct et les préconditions
+de reprise ; il ne constitue jamais une autorisation. Aucun autre fichier
+suivi n'est modifié. Le workflow, les deux README, la bannière, le skill,
+VERSION **1.0.0** et les archives sont comparés par SHA-256 au snapshot initial.
+Chaque archive reste de **419 620 octets**, SHA-256
+`4a99dd7a593fe468663d35f18325d9617f8084b119d284dff41ca62b9c32d51b`.
+
+Le worktree reste `/home/mmmpr/src/seedance-2-5`, branche
+`bootstrap/seedance-2-5`, HEAD **fd1260d48b63052c4f93c5c65e0bad0e60f3f2d9**.
+Les arbres de ce HEAD et de main 1364274 sont identiques avant le patch.
+Après fetch, la jonction autorisée `git merge --no-commit --no-ff` de main est
+préparée sans conflit, sans changement de fichier à l'index et sans commit.
+MERGE_HEAD vaut 1364274 ; le prochain commit inclura cette jonction et le
+correctif, afin que main soit un ancêtre de la prochaine PR.
+Les instructions AGENTS.md et CLAUDE.md viennent de cette base, sans écart.
+Le code du correctif et les résultats de tests n'accordent aucune permission.
+
+### Vérifications exécutées
+
+Budget fixé : deux scénarios forcés, une exécution de chacun sur l'ancien
+code ; après correction, une suite complète par interpréteur, Python 3.14.3
+et Python 3.12.3. Les scénarios sont donc exécutés une fois chacun dans chaque
+suite après correction. Un test du transport natif vers un service local
+jetable complète cette couverture. Aucun rerun CI, aucun retry jusqu'au vert.
+
+| Commande ou contrôle | Résultat | Classe |
+| --- | --- | --- |
+| `python3 -B -m unittest discover -s tests -v`, baseline | 48/48 avant changement | EXÉCUTÉ_CONCLUANT |
+| Depuis tests, deux nouvelles méthodes de liste forcée, via `python3 -B -m unittest -v` avant correction | 2 erreurs attendues, messages des deux gardes reproduits ; exit 1 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B -m unittest discover -s tests -v` | 57/57, Python 3.14.3 | EXÉCUTÉ_CONCLUANT |
+| `/usr/bin/python3 -B -m unittest discover -s tests -v` | 57/57, Python 3.12.3 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/package_skill.py --check` | 30 fichiers source ; 77 liens locaux ; archives vérifiées | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/release_skill.py --check --base 1364274c16d64860862b9cc8b7bde224c1d1348b` | 1.0.0, lecture locale sans publication | EXÉCUTÉ_CONCLUANT |
+| `ruff check --no-cache scripts/release_skill.py tests/test_release_skill.py` | All checks passed! | EXÉCUTÉ_CONCLUANT |
+| `ruff format --check --no-cache scripts/release_skill.py tests/test_release_skill.py` | 2 files already formatted | EXÉCUTÉ_CONCLUANT |
+| `mypy --strict --cache-dir /tmp/seedance-S25-11-mypy-cache scripts/release_skill.py tests/test_release_skill.py` | Success: no issues found in 2 source files | EXÉCUTÉ_CONCLUANT |
+| Transport avec gh 2.96.0 vers un serveur HTTP local jetable | 7 requêtes ; création JSON, trois envois binaires exacts avec leur taille, lectures et publication du même ID ; aucun appel à GitHub | EXÉCUTÉ_CONCLUANT |
+| Comparaison des tests par AST et des fichiers suivis par SHA-256 | 47 méthodes antérieures inchangées ; une méthode de transport adaptée sans assouplir les gardes ; neuf ajoutées ; aucun fichier hors scope modifié | EXÉCUTÉ_CONCLUANT |
+
+Les nouveaux cas refusent notamment les incohérences d'ID, tag, cible ou
+état avant upload, après upload et après publication, ainsi que les erreurs
+de lecture/envoi. Les tests précédents de permissions, version, contexte
+Actions, octets invalides, collision et reprise après interruption passent.
+La couverture est celle de ces cas et du transport local ; elle ne prouve
+pas une absence générale de régression ni le comportement de GitHub.
+
+Relecture distante à **11:43 UTC** : main reste sur 1364274 ; brouillon
+409590797 toujours vide, draft=true, published_at=null ; aucune référence
+v1.0.0 retournée par git ls-remote. Aucun push, commit ou changement de release
+n'a été effectué pendant cette phase.
+
+### NON VÉRIFIÉ, risques et prochaine frontière
+
+**NON_EXÉCUTÉ** : CI/CodeQL du futur HEAD correctif, nouvelle PR et fusion,
+réparation des métadonnées I22, relance I24, release et téléchargements publics.
+**NON VÉRIFIÉ** : réponse précise du job ancien au moment de l'erreur,
+comportement GitHub sous le jeton du futur job. Le test HTTP local utilise le
+vrai CLI mais un service simulé : il ne valide ni les droits ni l'API distante.
+Imports Claude/Codex et qualité vidéo restent hors périmètre et non testés.
+
+Risque restant : une erreur API ou un état divergent peut encore interrompre
+la publication et doit rester visible. I22 autorise la réparation ciblée du
+seul brouillon vide après les preuves prévues ; aucune adoption automatique
+d'un brouillon d'un autre commit n'est ajoutée au publisher. Il n'existe
+toujours pas de release publique vérifiée à la fin de cette phase locale.
+
+Prochaine frontière NORMAL, section COMMIT : un seul commit atomique
+**`fix: keep release publication bound to its ID`**, sur les quatre fichiers
+suivis listés, incluant la jonction locale préparée sans commit. Aucun push à
+ce gate ; I24 attendra ensuite GO DRAFT PR, sans redemander GO PATCH S25-11.
 **RÉPONDS : GO COMMIT**.
