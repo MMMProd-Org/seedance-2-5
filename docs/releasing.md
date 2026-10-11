@@ -50,9 +50,12 @@ For a new version, the job:
 The creation response supplies the release ID. The publisher keeps that ID for
 uploads and subsequent reads, checking the tag, target commit and draft state
 at each stage. It does not require a newly created or updated release to appear
-immediately in the release listing. An existing draft found by version is read
-again by ID before any upload. API errors remain failures; no delay or retry is
-used to conceal an incomplete listing.
+immediately in the release listing. An existing release found by version is read
+again by ID before checking its state, target or assets. If that read shows the
+release is already public, the existing verification path checks its files and
+tag without writing. An identical published version keeps its original commit
+after documentation-only changes. API errors remain failures; no delay or retry
+is used to conceal an incomplete listing.
 
 Both archives have identical bytes and the same internal seedance-2-5 folder.
 SHA256SUMS records the SHA-256 of each archive. On Linux, macOS or WSL, download

@@ -328,6 +328,10 @@ def publish(root: Path, environment: Mapping[str, str], github: GitHub) -> str:
     tag = f"v{version}"
     expected = expected_assets(root)
     release = github.release(tag)
+    if release is not None:
+        release = github.release_by_id(release.id)
+        if release.tag != tag:
+            raise ValueError("Release tag changed")
     tag_sha = github.tag_sha(tag)
     if tag_sha is not None and git(
         root, "diff", "--name-only", tag_sha, "--", *PAYLOAD_PATHS
@@ -356,8 +360,6 @@ def publish(root: Path, environment: Mapping[str, str], github: GitHub) -> str:
                 encoding="utf-8",
             )
             release = github.create(tag, sha, notes)
-        else:
-            release = github.release_by_id(release.id)
         if not release.draft or release.target != sha or release.tag != tag:
             raise ValueError("Expected draft for the checked commit")
         verify_assets(github, release, expected, complete=False)

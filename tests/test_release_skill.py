@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from dataclasses import replace
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
@@ -197,6 +197,79 @@ class ReleaseSkillTests(unittest.TestCase):
         self.assertEqual(self.github.read_ids, [7, 7, 7])
         self.assertEqual(self.github.writes, ["publish"])
 
+    def test_repaired_draft_uses_current_target_from_id(self) -> None:
+        self.github.current = release_skill.Release(7, "v1.0.0", self.sha, True, ())
+        stale = replace(self.github.current, target="a" * 40)
+        with patch.object(self.github, "release", return_value=stale) as listing:
+            self.assertIn(f"Published v1.0.0 at {self.sha}", self.publish())
+        listing.assert_called_once_with("v1.0.0")
+        self.assertEqual(self.github.read_ids, [7, 7, 7])
+        self.assertEqual(
+            self.github.writes,
+            [
+                "upload:seedance-2-5.skill",
+                "upload:seedance-2-5.zip",
+                "upload:SHA256SUMS",
+                "publish",
+            ],
+        )
+        self.assertEqual(self.github.contents, release_skill.expected_assets(self.root))
+
+    def test_published_release_uses_current_state_from_id(self) -> None:
+        self.seed_release()
+        public = self.github.current
+        if public is None:
+            self.fail("Missing fixture")
+        stale = replace(public, draft=True)
+        with patch.object(self.github, "release", return_value=stale) as listing:
+            self.assertIn(f"Already published v1.0.0 at {self.sha}", self.publish())
+        listing.assert_called_once_with("v1.0.0")
+        self.assertEqual(self.github.read_ids, [7])
+        self.assertEqual(self.github.writes, [])
+
+    def test_refreshed_public_release_keeps_validation_guards(self) -> None:
+        self.seed_release()
+        public = self.github.current
+        if public is None:
+            self.fail("Missing fixture")
+        stale = replace(public, draft=True)
+        expected = release_skill.expected_assets(self.root)
+        for current, tag_commit, contents, error in [
+            (replace(public, tag="v9.0.0"), self.sha, expected, "Release tag changed"),
+            (
+                replace(public, assets=public.assets[:-1]),
+                self.sha,
+                expected,
+                "Release assets are missing",
+            ),
+            (
+                replace(
+                    public,
+                    assets=(replace(public.assets[0], size=0), *public.assets[1:]),
+                ),
+                self.sha,
+                expected,
+                "Release asset metadata differs",
+            ),
+            (public, None, expected, "Published release has no commit tag"),
+            (
+                public,
+                self.sha,
+                {**expected, "seedance-2-5.skill": b"tampered"},
+                "Release asset bytes differ",
+            ),
+        ]:
+            with self.subTest(error=error):
+                self.github = FakeGitHub(self.root, self.sha)
+                self.github.current = current
+                self.github.tag_commit = tag_commit
+                self.github.contents = contents
+                with patch.object(self.github, "release", return_value=stale):
+                    with self.assertRaisesRegex(ValueError, error):
+                        self.publish()
+                self.assertEqual(self.github.read_ids, [7])
+                self.assertEqual(self.github.writes, [])
+
     def test_created_draft_metadata_is_checked_before_upload(self) -> None:
         draft = release_skill.Release(7, "v1.0.0", self.sha, True, ())
         for invalid in [
@@ -215,16 +288,28 @@ class ReleaseSkillTests(unittest.TestCase):
         draft = self.github.current
         if draft is None:
             self.fail("Missing fixture")
-        for invalid in [
-            replace(draft, tag="v9.0.0"),
-            replace(draft, target="a" * 40),
-            replace(draft, draft=False),
+        for invalid, error in [
+            (replace(draft, tag="v9.0.0"), "Release tag changed"),
+            (replace(draft, target="a" * 40), "Draft belongs to another commit"),
         ]:
             with self.subTest(invalid=invalid):
                 with patch.object(self.github, "release_by_id", return_value=invalid):
-                    with self.assertRaisesRegex(ValueError, "Expected draft"):
+                    with self.assertRaisesRegex(ValueError, error):
                         self.publish()
                 self.assertEqual(self.github.writes, [])
+        public = replace(draft, draft=False)
+        with (
+            patch.object(self.github, "release_by_id", return_value=public) as read,
+            patch.object(
+                self.github, "asset_bytes", wraps=self.github.asset_bytes
+            ) as downloads,
+        ):
+            self.assertIn(f"Already published v1.0.0 at {self.sha}", self.publish())
+        read.assert_called_once_with(draft.id)
+        self.assertEqual(
+            downloads.call_args_list, [call(asset) for asset in public.assets]
+        )
+        self.assertEqual(self.github.writes, [])
 
     def test_changed_draft_after_upload_stops_before_publication(self) -> None:
         draft = release_skill.Release(7, "v1.0.0", self.sha, True, ())
