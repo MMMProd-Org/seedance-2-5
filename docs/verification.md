@@ -1,6 +1,6 @@
 # Rapport de vérification — S25-01
 
-Dernière phase locale : [S25-12 — état courant avant reprise](#s25-12--état-courant-avant-reprise-11-octobre-2026).
+Dernière phase locale : [S25-14 — critère du lien privé et reprise préparée](#s25-14--critère-du-lien-privé-et-reprise-préparée-11-octobre-2026).
 Les sections précédentes conservent leur état historique.
 
 État constaté le **10 octobre 2026**, à la fin de la phase PATCH et avant le
@@ -1096,3 +1096,209 @@ frontière NORMAL, section COMMIT : un seul commit atomique
 fichiers suivis listés. Aucun push à ce gate ; le nouveau HEAD attendra
 GO DRAFT PR avant le push normal et la mise à jour de la PR #4 déjà ready.
 **RÉPONDS : GO COMMIT**.
+
+## S25-13 — identité explicite et restauration du nom (11 octobre 2026)
+
+Autorisation directe : **GO PATCH S25-13**, ITEMS I28, I29, I30 et I31.
+Contrat **NORMAL**. Aucun commit ou push de ce patch ; les gates COMMIT et
+DRAFT PR restent requis. Le périmètre et les résultats sont séparés de la
+publication publique, toujours non effectuée.
+
+### Cause constatée et décision
+
+La [PR #4](https://github.com/MMMProd-Org/seedance-2-5/pull/4) a été fusionnée
+au SHA **8f01509554b8651c9b221aa3a73efa5f8b26e584**. Le
+[workflow main, tentative 1](https://github.com/MMMProd-Org/seedance-2-5/actions/runs/38140455205)
+a exécuté 60 tests et validé le paquet. Son job publish a échoué sur le seul
+refus attendu : `Draft belongs to another commit; rerun its original job`.
+Sous l'ITEM I22 approuvé, la cible et la ligne Checked commit du brouillon
+409590797 ont été mises à jour une fois. Sa réponse a aussi changé tag_name
+vers `untagged-015f738528c4761d7df1`. Le contrôle l'a détecté ; aucune relance
+n'a suivi. La réponse PATCH et les GET suivants sont conservés dans les
+preuves locales.
+
+La requête de publication de [GitHub.publish](../scripts/release_skill.py)
+omettait elle aussi tag_name et target_commitish. Un test de transport sous
+mock de commande, une exécution et deux sous-cas, a échoué sur les deux champs
+absents. Il prouve la sérialisation sortante ; il ne reproduit pas la logique
+interne du serveur GitHub.
+
+Le correctif ajoute les valeurs tag et cible de l'objet Release déjà validé
+au même PATCH par ID, avec draft=false et make_latest=legacy conservés. Le
+CLI, le workflow et ses droits ne changent pas. Le test existant qui attendait
+la requête sans ces identités est adapté explicitement sous I28 ; ses autres
+assertions sont conservées. Le nouveau test utilise deux versions/cibles et
+vérifie ID, dépôt, méthode, entrée JSON et quatre champs exacts.
+
+### Fichiers et couverture
+
+| Fichier | Modification |
+| --- | --- |
+| `scripts/release_skill.py` | Deux identités explicites dans la requête GitHub.publish |
+| `tests/test_release_skill.py` | Un test avec deux sous-cas ; attente de transport adaptée sous I28 |
+| `docs/releasing.md` | Identités envoyées et reprise ciblée avec tag explicite |
+| `docs/verification.md` | Résultats S25-12/S25-13 et arrêt de préservation documentés |
+
+Un seul corps de fonction de production change : GitHub.publish. Son appelant
+est publish, après validation de la release relue après upload. FakeGitHub,
+les objets Release/Asset, le CLI et les autres méthodes GitHub gardent leur
+structure. Les 59 autres méthodes de tests antérieures sont inchangées ; une
+attente est adaptée, une méthode ajoutée, aucune supprimée ou skippée.
+
+La jonction de main à la branche de cette session est préparée avec
+`git merge --no-commit --no-ff 8f01509554b8651c9b221aa3a73efa5f8b26e584`.
+Les arbres étaient identiques ; aucun conflit, aucun commit automatique et
+aucune réécriture d'historique. Les parents futurs attendus sont
+5bb96e90e2521fd9f928d883922dae0b6078f689 et
+8f01509554b8651c9b221aa3a73efa5f8b26e584.
+
+### Vérifications locales exécutées
+
+Budget fixé avant exécution : test ciblé avant déjà exécuté une fois, puis une
+suite complète par Python installé. Aucun retry pour obtenir un premier vert.
+
+| Commande | Résultat | Classe |
+| --- | --- | --- |
+| `python3 -B /tmp/seedance-S25-13-transport-before.py`, avant patch | Un test, deux sous-cas, deux échecs attendus ; exit 1, commande GitHub mockée | EXÉCUTÉ_CONCLUANT pour le diagnostic |
+| `python3 -B -m unittest discover -s tests -v` | 61/61, Python 3.14.3 | EXÉCUTÉ_CONCLUANT |
+| `/usr/bin/python3 -B -m unittest discover -s tests -v` | 61/61, Python 3.12.3 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/package_skill.py --check` | 30 fichiers source, 78 liens locaux, archives et rapport vérifiés | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/release_skill.py --check --base 8f01509554b8651c9b221aa3a73efa5f8b26e584` | 1.0.0 | EXÉCUTÉ_CONCLUANT |
+| `ruff check --no-cache scripts/release_skill.py tests/test_release_skill.py` | All checks passed! | EXÉCUTÉ_CONCLUANT |
+| `ruff format --check --no-cache scripts/release_skill.py tests/test_release_skill.py` | 2 files already formatted | EXÉCUTÉ_CONCLUANT |
+| `mypy --strict --cache-dir /tmp/seedance-S25-13-mypy-cache scripts/release_skill.py tests/test_release_skill.py` | Aucune erreur sur deux fichiers | EXÉCUTÉ_CONCLUANT |
+
+Les tests existants couvrent encore les deux reprises de S25-12, un brouillon
+d'un autre commit, les collisions produit, les octets/digests invalides, les
+erreurs API/permission, l'envoi interrompu et une version publique historique
+après une modification documentaire. La couverture est limitée à ces scénarios
+et aux archives comparées ; aucun verdict général « aucune régression ».
+
+### I30 — une restauration exécutée, préservation stricte non validée
+
+Préconditions vérifiées immédiatement avant : main exact, même ID 409590797,
+ancien tag untagged attendu, brouillon non publié et vide, aucune référence Git
+v1.0.0, cible et ligne Checked commit exactes, toutes les métadonnées identiques
+au snapshot approuvé. La requête contient tag_name=v1.0.0, target_commitish
+inchangé et body identique. Une seule écriture a été exécutée sous I30.
+
+Le GET après l'appel, puis le GET de diagnostic, montrent : tag_name=v1.0.0,
+même ID, même cible et mêmes notes ; draft=true, published_at=null, aucun
+fichier ; aucun tag Git v1.0.0 créé. Parmi 21 champs retournés, les différences
+sont exactement tag_name, updated_at et html_url. Le lien de brouillon est
+passé de `untagged-015f738528c4761d7df1` à
+`untagged-72e8dddaf26908998f65` dans le même dépôt.
+
+Le contrôle approuvé attendait seuls tag_name et updated_at changés. Il a donc
+échoué. Le nom restauré est **PROUVÉ** ; le respect de cette postcondition
+stricte est **FAUX**, et l'action I30 ne reçoit pas un verdict global de succès.
+Le champ html_url n'entre pas dans l'objet Release utilisé par le publisher,
+mais cette observation ne modifie pas automatiquement le critère approuvé.
+Aucune assertion n'est désactivée, aucun deuxième PATCH, aucune relance ni
+publication après cet arrêt.
+
+### NON VÉRIFIÉ et frontière suivante
+
+**NON_EXÉCUTÉ** : commit/push de S25-13, nouvelle PR/CI, fusion I31, seconde
+action I30 sur la cible future, rerun et première publication publique avec
+ses téléchargements. **NON VÉRIFIÉ** : cause interne du renommage initial,
+logique de génération du lien de brouillon et effet du nouveau PATCH de
+publication sous le jeton Actions. Imports Claude/Codex et qualité vidéo
+restent non testés dans cette phase.
+
+La simple valeur tag_name correcte ne suffit pas à effacer l'échec du contrôle.
+Une proposition **S25-14, ITEM I32**, est préparée pour examiner explicitement
+le lien de brouillon renvoyé par le même ID, en maintenant tous les contrôles
+d'identité, cible, notes, fichiers et état. Elle est non autorisée avant un GO
+PATCH S25-14 direct ; aucune écriture distante supplémentaire n'y est proposée.
+Ce changement concerne la postcondition approuvée, pas un retry de restauration.
+
+Worktree `/home/mmmpr/src/seedance-2-5`, branche `bootstrap/seedance-2-5`, HEAD
+5bb96e90e2521fd9f928d883922dae0b6078f689, jonction préparée sans commit et index
+sans patch stagé. Les quatre fichiers du périmètre sont modifiés ; aucune
+intégration distante de S25-13. Les ITEMS I28/I29 ont leurs résultats locaux ;
+I30 a l'écart ci-dessus ; I31 reste conditionnel aux gates et contrôles prévus.
+
+## S25-14 — critère du lien privé et reprise préparée (11 octobre 2026)
+
+### Décision et autorisation
+
+Autorisation directe : **GO PATCH S25-14**, seul ITEM **I32**, contrat **NORMAL**.
+Le nouveau critère accepte explicitement le changement du lien privé observé
+sous S25-13, avec le dépôt et le format vérifiés. L'échec du critère précédent
+reste conservé ; il n'est pas reclassé comme un succès. Cette phase n'exécute
+aucune écriture distante, aucun commit, push ou rerun.
+
+Comparer les 21 clés et toutes les valeurs avant/après : seuls tag_name=v1.0.0,
+updated_at et html_url peuvent différer lors de la restauration du nom. Les deux
+liens privés doivent appartenir exactement à MMMProd-Org/seedance-2-5, sur le
+chemin releases/tag/untagged- suivi de 20 caractères hexadécimaux minuscules.
+Même ID 409590797, mêmes URL REST/assets/upload, cible et notes conservées,
+draft=true, published_at=null, assets vides ; aucun tag Git v1.0.0. Un champ
+ajouté, manquant ou autrement modifié arrête le contrôle.
+
+Pour S25-13-TARGET, opération future déjà autorisée sous conditions : tag_name
+reste v1.0.0 ; seules la cible et l'unique ligne Checked commit prévue changent.
+updated_at et html_url peuvent différer sous les mêmes contrôles de lien et
+d'identité ; toute autre différence reste refusée. Aucune nouvelle opération
+ou permission n'est autorisée par ce rapport.
+
+### Fichiers modifiés dans I32
+
+| Fichier | Modification |
+| --- | --- |
+| `docs/releasing.md` | Critère explicite du lien privé ; autres champs et état strictement préservés |
+| `docs/verification.md` | Preuve I32 et préparation du lot S25-13/S25-14 |
+| `.session-scope.json`, ignoré | Trace de l'autorisation directe et des vérifications ; hors commit |
+
+Le vérificateur et les preuves sont temporaires, sous /tmp. Les deux fichiers
+Python modifiés sous S25-13 restent identiques aux octets testés :
+`scripts/release_skill.py`, SHA-256
+e547620bc8ba71a7355f69744973b17b7239b5376bb590520fb9467b660630cc ;
+`tests/test_release_skill.py`, SHA-256
+fa22d3599bea4c674581650671e3327bfb61121a78cbaf055669b189beb467cc.
+
+### Vérifications exécutées
+
+Budget fixé avant exécution : une comparaison capturée, une matrice négative,
+un seul snapshot frais, quatre lectures distantes maximum et aucune écriture.
+Aucune relance jusqu'au premier vert.
+
+| Commande ou contrôle | Résultat | Classe |
+| --- | --- | --- |
+| `python3 -B /tmp/seedance-S25-14-verify-draft.py` | Critère I32 satisfait sur la réponse capturée et le GET frais ; échec antérieur conservé | EXÉCUTÉ_CONCLUANT |
+| Auto-contrôles du même vérificateur | 25 cas refusés : ID, version, cible, notes, état, fichier, métadonnées, URL et champs incomplets/inconnus ; réponse cible future simulée acceptée | EXÉCUTÉ_CONCLUANT |
+| GET release 409590797, GraphQL PR4/main, ls-remote et GET jobs 38140455205 | Quatre lectures, zéro mutation ; même brouillon et refs, aucun nouveau commentaire/review/check | EXÉCUTÉ_CONCLUANT |
+| Empreintes du code et des tests comparées aux preuves S25-13 | Identiques ; 61/61 sur Python 3.12.3 et 3.14.3 réutilisés sans nouvelle exécution | EXÉCUTÉ_CONCLUANT pour l'identité des octets |
+| `python3 -B scripts/package_skill.py --check` | 30 fichiers source, 78 liens locaux, deux archives vérifiées ; exit 0 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/release_skill.py --check --base 8f01509554b8651c9b221aa3a73efa5f8b26e584` | 1.0.0 ; exit 0 | EXÉCUTÉ_CONCLUANT |
+| `git diff --check` et comparaison des 46 fichiers suivis | Diff valide ; quatre chemins autorisés modifiés, 42 autres identiques | EXÉCUTÉ_CONCLUANT |
+
+Snapshot frais : 2026-10-11T17:41:28.483604+00:00. main reste
+8f01509554b8651c9b221aa3a73efa5f8b26e584 ; la PR4 est fusionnée. Les jobs de son
+workflow main restent check=success et publish=failure. Le code S25-13 n'a
+pas encore été poussé : aucune CI distante ne le valide actuellement.
+
+### NON VÉRIFIÉ, risques et frontière COMMIT
+
+**NON_EXÉCUTÉ** : nouvelle exécution des suites, lint et types pour les mêmes
+octets ; commit/push, nouvelle PR/CI, fusion, S25-13-TARGET, rerun et publication.
+**NON VÉRIFIÉ** : navigation Web du lien privé, mécanisme serveur qui le génère,
+effet réel de la nouvelle requête sous le jeton Actions, imports Claude/Codex
+et qualité vidéo. Les auto-contrôles du vérificateur limitent le risque d'une
+acceptation trop large ; ils ne prouvent pas le comportement interne de GitHub.
+Aucun verdict général « aucune régression ». Aucun nouveau problème hors du
+périmètre inspecté n'est établi par cette phase.
+
+Worktree `/home/mmmpr/src/seedance-2-5`, branche `bootstrap/seedance-2-5`, HEAD
+5bb96e90e2521fd9f928d883922dae0b6078f689 ; jonction main préparée, index vide,
+aucun conflit. Les parents du seul commit proposé sont ce HEAD et
+8f01509554b8651c9b221aa3a73efa5f8b26e584. Lot atomique proposé :
+**`fix: preserve release identity when publishing`**, exactement
+`scripts/release_skill.py`, `tests/test_release_skill.py`, `docs/releasing.md`
+et `docs/verification.md`. Le scope ignoré et les preuves temporaires restent
+hors commit. Les actions conditionnelles S25-13 I30-TARGET/I31 restent liées
+aux gates et contrôles déjà approuvés ; S25-13-TAG n'est pas rejoué.
+
+Prochaine frontière NORMAL, section COMMIT : **RÉPONDS : GO COMMIT**.
+Aucun push à ce gate ; GO DRAFT PR restera requis pour la livraison.

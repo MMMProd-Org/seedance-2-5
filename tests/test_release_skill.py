@@ -610,6 +610,36 @@ class ReleaseSkillTests(unittest.TestCase):
             self.publish()
         self.assertEqual(self.github.writes, [])
 
+    def test_github_publication_preserves_tag_and_target(self) -> None:
+        github = release_skill.GitHub(self.root)
+        for tag, target in [("v1.0.0", self.sha), ("v2.3.4", "a" * 40)]:
+            with self.subTest(tag=tag):
+                with patch.object(release_skill, "command", return_value=b"") as run:
+                    github.publish(release_skill.Release(7, tag, target, True, ()))
+                self.assertEqual(
+                    run.call_args.args[0],
+                    [
+                        "gh",
+                        "api",
+                        f"repos/{release_skill.REPOSITORY}/releases/7",
+                        "--method",
+                        "PATCH",
+                        "--input",
+                        "-",
+                    ],
+                )
+                self.assertEqual(run.call_args.args[1], self.root)
+                request = json.loads(run.call_args.args[2])
+                self.assertEqual(
+                    request,
+                    {
+                        "tag_name": tag,
+                        "target_commitish": target,
+                        "draft": False,
+                        "make_latest": "legacy",
+                    },
+                )
+
     def test_github_commands_bind_commit_repo_and_native_latest_policy(self) -> None:
         github = release_skill.GitHub(self.root)
         notes = self.root / "notes & checks.md"
@@ -659,7 +689,15 @@ class ReleaseSkillTests(unittest.TestCase):
             self.assertNotIn("--clobber", run.call_args.args[0])
             github.publish(release_skill.Release(7, "v1.0.0", self.sha, True, ()))
             request = json.loads(run.call_args.args[2])
-            self.assertEqual(request, {"draft": False, "make_latest": "legacy"})
+            self.assertEqual(
+                request,
+                {
+                    "tag_name": "v1.0.0",
+                    "target_commitish": self.sha,
+                    "draft": False,
+                    "make_latest": "legacy",
+                },
+            )
 
     def test_github_read_failure_never_creates_a_release(self) -> None:
         github = release_skill.GitHub(self.root)
