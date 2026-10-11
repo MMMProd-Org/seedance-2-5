@@ -29,8 +29,8 @@
 
 ---
 
-Vous voyez déjà la scène : une femme devant une entrée vitrée, quelqu’un qu’elle
-attend, personne qui arrive. Ce qui nous intéresse, c’est l’attente.
+Vous voyez déjà la scène : une femme devant une entrée vitrée, qui attend quelqu’un.
+Personne n’arrive. Ce qui nous intéresse, c’est l’attente.
 
 Où regarde-t-elle ? Que se passe-t-il en six secondes ? La caméra doit-elle bouger ?
 Seedance 2.5 donne à votre assistant une méthode de mise en scène pour décider :
@@ -43,8 +43,12 @@ le cadre, le jeu, le mouvement et la continuité.
 > Une femme attend devant une entrée vitrée.
 
 <p align="center">
-  <img src="assets/seedance-direction.svg" width="100%" alt="Trois choix de mise en scène pour le cas textuel : un plan moyen fixe de six secondes en 9:16 ; un souffle relâché ; les mains restent ensemble et la porte fermée.">
+  <img src="assets/seedance-direction.svg" width="100%" alt="Trois choix numérotés de mise en scène pour le cas textuel : 01 un plan moyen fixe de six secondes en 9:16 ; 02 un souffle relâché ; 03 les mains restent ensemble et la porte fermée.">
 </p>
+
+- **01 / Cadre :** plan moyen fixe de six secondes, en 9:16.
+- **02 / Jeu :** un souffle relâché ; les doigts se détendent une fois.
+- **03 / Continuité :** les mains restent ensemble, la porte reste fermée.
 
 La demande devient une série de décisions visibles : la caméra côté rue,
 un regard tenu hors champ, un souffle relâché, les doigts qui se détendent une fois.

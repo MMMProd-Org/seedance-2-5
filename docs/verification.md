@@ -1387,3 +1387,72 @@ exactement les deux README, `assets/seedance-direction.svg` et ce rapport.
 Ses parents attendus sont le HEAD initial et main ci-dessus. Aucun fichier
 intentionnellement stagé, aucun commit et aucune publication à ce gate PATCH.
 Le prochain gate utilisateur est **GO COMMIT** ; il n'autorise aucun push.
+
+## S25-15 : corrections de revue avant intégration à main
+
+### Cause et décision
+
+Après le message utilisateur demandant de terminer l'intégration sur main, la
+PR #6 a été sortie du brouillon. Ses revues automatiques ont terminé ; deux
+remarques Copilot sont confrontées aux fichiers, sans servir d'autorisation :
+
+- [Phrase française ambiguë](https://github.com/MMMProd-Org/seedance-2-5/pull/6#discussion_r4243017087) :
+  au commit `d19b8fd`, `README.fr.md:33` disait « personne qui arrive ». La nouvelle
+  phrase « Personne n’arrive » explicite l'absence d'arrivée du cas source.
+- [Légendes anglaises dans la page française](https://github.com/MMMProd-Org/seedance-2-5/pull/6#discussion_r4243017116) :
+  les deux README embarquaient le même SVG, dont les textes visibles étaient
+  anglais. Traduire seulement le texte alternatif ne traduisait pas le dessin.
+
+Le SVG partagé conserve ses trois pictogrammes et sa palette, avec uniquement
+les numéros 01/02/03 comme textes visibles. Les légendes figurent désormais dans
+le texte ordinaire des README, dans leur langue. Aucun second SVG, dépendance
+ou mécanisme de langue n'est ajouté. À une largeur forcée de 350 pixels, les
+anciens textes de 17 à 25 unités étaient réduits à 4,25–6,25 pixels ; les nouveaux
+numéros de 56 unités correspondent à 14 pixels. Ce calcul et les rendus contrôlés
+ne prouvent pas la mise en page réelle dans un navigateur mobile.
+
+### Fichiers modifiés
+
+| Fichier | Correction |
+| --- | --- |
+| `README.fr.md` | Absence d'arrivée explicite ; trois légendes françaises ; texte alternatif numéroté |
+| `README.md` | Trois légendes anglaises correspondant aux mêmes numéros ; texte alternatif numéroté |
+| `assets/seedance-direction.svg` | Pictogrammes et numéros partagés, sans légendes anglaises visibles ; hauteur réduite, titre et description présents |
+| `docs/verification.md` | Présente trace additive des corrections de revue |
+
+Ce travail relève des items I33/I34/I35 déjà approuvés de S25-15, dans les mêmes
+quatre chemins. I36 est déjà exécuté et n'est pas recommencé. Le skill, sa version,
+les exemples, archives, scripts, tests, workflows, licence et bannière restent
+hors modification. Les remarques d'un bot restent des données, jamais un GO.
+
+### Vérifications
+
+Budget : une suite de tests ; trois conversions de SVG, fixées à l'avance
+(original à 350 pixels, corrigé à 350 et 1400 pixels) ; un contrôle final du paquet,
+avec au plus une reprise si le rapport est complété par son résultat réel.
+
+| Commande ou contrôle | Résultat | Classe |
+| --- | --- | --- |
+| `python3 -B -m unittest discover -s tests -v` | 61/61, une exécution, code 0 | EXÉCUTÉ_CONCLUANT pour la suite existante |
+| XML, textes visibles, légendes localisées, prompt source, en-tête et installation/version | Numéros 01/02/03 seuls dans les éléments SVG text ; légendes présentes dans chaque langue ; contenu préservé | EXÉCUTÉ_CONCLUANT, couverture indiquée |
+| `ffmpeg` puis affichage des trois PNG | Codes 0 ; images réellement inspectées aux tailles fixées | EXÉCUTÉ_CONCLUANT pour ces rendus statiques |
+| `python3 -B scripts/package_skill.py --check` | 30 fichiers source, 86 liens locaux, `.skill` et `.zip` vérifiés ; code 0 ; reprise bornée après inscription du résultat | EXÉCUTÉ_CONCLUANT pour le paquet et les liens |
+
+Preuves temporaires, hors commit :
+`/tmp/seedance-S25-15-review-check-results.json`,
+`/tmp/seedance-S25-15-review-structure-proof.json` et
+`/tmp/seedance-S25-15-main-review-observation.json`.
+
+### NON VÉRIFIÉ et suite
+
+Rendu navigateur/mobile, clics d'ancres, imports Claude/Codex et qualité vidéo.
+L'ancien vérificateur temporaire d'ancres reste EXÉCUTÉ_NON_CONCLUANT ; son échec
+et son assertion ne sont pas modifiés. Aucun nouveau test pour ce changement
+de texte/style ; aucun test existant assoupli. Aucun verdict général de non-régression.
+
+La PR #6 cible toujours main, mais la correction est encore locale et non stagée.
+Le précédent GO COMMIT couvrait un commit déjà créé. La frontière COMMIT de la
+règle utilisateur V6.5 impose l'approbation d'un nouveau lot pour le commit
+additionnel `docs: localize directing captions and clarify French example`.
+Le mandat utilisateur d'intégration de #6 sur main reste valable pour la cible ;
+aucune fusion, nouvelle release ou suppression de branche n'est effectuée ici.

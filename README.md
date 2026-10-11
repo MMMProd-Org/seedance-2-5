@@ -43,8 +43,12 @@ framing, performance, movement and continuity.
 > A woman waits outside a glass entrance.
 
 <p align="center">
-  <img src="assets/seedance-direction.svg" width="100%" alt="Three directing choices for the text example: a fixed medium shot in 9:16 lasting six seconds; one breath released; hands staying together and the door staying closed.">
+  <img src="assets/seedance-direction.svg" width="100%" alt="Three numbered directing choices for the text example: 01 a fixed medium shot in 9:16 lasting six seconds; 02 one breath released; 03 hands staying together and the door staying closed.">
 </p>
+
+- **01 / Frame:** a locked medium shot lasting six seconds, in 9:16.
+- **02 / Performance:** one breath released; fingers relax once.
+- **03 / Continuity:** hands stay together, the door stays closed.
 
 The brief becomes a set of visible decisions: a camera on the curb side,
 a gaze held off-screen, a breath released, fingers relaxing once.
