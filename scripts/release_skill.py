@@ -234,7 +234,14 @@ class GitHub:
                 "-",
             ],
             self.root,
-            json.dumps({"draft": False, "make_latest": "legacy"}).encode(),
+            json.dumps(
+                {
+                    "tag_name": release.tag,
+                    "target_commitish": release.target,
+                    "draft": False,
+                    "make_latest": "legacy",
+                }
+            ).encode(),
         )
 
 

@@ -54,8 +54,10 @@ immediately in the release listing. An existing release found by version is read
 again by ID before checking its state, target or assets. If that read shows the
 release is already public, the existing verification path checks its files and
 tag without writing. An identical published version keeps its original commit
-after documentation-only changes. API errors remain failures; no delay or retry
-is used to conceal an incomplete listing.
+after documentation-only changes. The publication PATCH explicitly sends the
+validated tag and target commit alongside draft=false and make_latest=legacy.
+API errors remain failures; no delay or retry is used to conceal an incomplete
+listing.
 
 Both archives have identical bytes and the same internal seedance-2-5 folder.
 SHA256SUMS records the SHA-256 of each archive. On Linux, macOS or WSL, download
@@ -97,10 +99,23 @@ targeted recovery plan. Verify its exact identity, old target and Checked commit
 line, that it has no assets or tag, that its old commit is an ancestor of the
 new main commit, and that the skill and downloads are identical between those
 commits. The PR checks and the new main checks must pass first. Change only its
-target and Checked commit line, preserving all other metadata, then verify the
-response and rerun the new workflow once. Stop on any changed precondition or
-failure. The publisher does not automate this exception; populated drafts and
-published releases are never rebound by this procedure.
+target and Checked commit line, explicitly sending the unchanged tag_name as
+well. Compare the complete response by ID with the saved object before
+rerunning the new workflow once. Stop on any changed precondition or failure.
+If the tag name itself needs repair, that requires a separately approved
+targeted operation; never rerun publication while the draft has a different
+tag name. The publisher does not automate this exception; populated drafts
+and published releases are never rebound by this procedure.
+
+For the approved empty-draft recovery, only the approved tag or target/Checked
+commit changes, updated_at and the private html_url may differ. Both private
+links must match `https://github.com/MMMProd-Org/seedance-2-5/releases/tag/untagged-`
+followed by exactly 20 lowercase hexadecimal characters. The release ID, REST,
+asset and upload URLs, remaining metadata, unpublished state and empty assets
+must be preserved; added, missing or otherwise changed fields fail the check.
+This criterion verifies the observed response; it does not assume every server
+response uses this format. Keep any earlier failed check as evidence and record
+the new criterion separately. The private draft link is not a public download.
 
 An identical public release is verified without any new write. An interrupted
 job that published before failing can therefore be rerun safely. Do not create
