@@ -1,54 +1,71 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="title description">
-  <title id="title">Seedance 2.5: give your scene a plan</title>
-  <desc id="description">An original cinema-inspired banner. A dark teal scene frame, an amber focus mark and three connected shots represent action, camera and continuity.</desc>
-  <defs>
-    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#101d25"/>
-      <stop offset="1" stop-color="#18383b"/>
-    </linearGradient>
-    <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#355b60"/>
-      <stop offset="1" stop-color="#10292e"/>
-    </linearGradient>
-  </defs>
-  <rect width="1200" height="440" rx="24" fill="url(#background)"/>
-  <g fill="none" stroke="#a8c9c4" opacity=".12">
-    <path d="M0 88H1200M0 176H1200M0 264H1200M0 352H1200"/>
-    <path d="M120 0V440M360 0V440M600 0V440M840 0V440M1080 0V440"/>
-  </g>
-  <g font-family="Arial, Helvetica, sans-serif">
-    <rect x="66" y="53" width="218" height="31" rx="15.5" fill="#294345"/>
-    <text x="175" y="74" text-anchor="middle" font-size="13" letter-spacing="2" fill="#c4dfd6">THE DIRECTOR'S SKILL</text>
-    <text x="62" y="171" font-size="76" font-weight="700" letter-spacing="-3" fill="#fff4df">Seedance <tspan fill="#ffbd73">2.5</tspan></text>
-    <text x="67" y="221" font-size="30" fill="#e2eae4">Give your scene a plan.</text>
-    <text x="68" y="263" font-size="17" fill="#b7ccc5">Action. Camera. Performance. Continuity.</text>
-    <path d="M68 301H608" stroke="#527471"/>
-    <text x="68" y="337" font-size="14" letter-spacing="2" fill="#ffbd73">YOUR IDEA</text>
-    <text x="275" y="337" font-size="14" letter-spacing="2" fill="#c8ddd4">A CLEAR PROMPT</text>
-    <text x="497" y="337" font-size="14" letter-spacing="2" fill="#c8ddd4">YOUR SHOT</text>
-    <path d="M187 331H246M439 331H469" stroke="#6c9590" stroke-width="2"/>
-    <text x="68" y="392" font-size="13" fill="#a6bfb6">FOR CLAUDE AND CODEX</text>
-  </g>
-  <g transform="translate(718 76)">
-    <rect x="0" y="0" width="405" height="229" rx="13" fill="url(#frame)" stroke="#527c78"/>
-    <path d="M135 0V229M270 0V229M0 76H405M0 153H405" stroke="#75998c" opacity=".22"/>
-    <path d="M0 190L135 103L250 167L324 126L405 185V229H0Z" fill="#183a3b"/>
-    <circle cx="253" cy="62" r="21" fill="#ffbd73"/>
-    <path d="M114 200V146M114 154L99 174M114 154L129 174M114 187L105 211M114 187L123 211" stroke="#d9eadf" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="114" cy="137" r="8" fill="#d9eadf"/>
-    <path d="M23 57V23H57M348 23H382V57M382 172V206H348M57 206H23V172" fill="none" stroke="#ffbd73" stroke-width="3"/>
-    <circle cx="202.5" cy="114.5" r="17" fill="none" stroke="#ffbd73" opacity=".65"/>
-    <path d="M191 114.5H214M202.5 103V126" stroke="#ffbd73" opacity=".65"/>
-    <g transform="translate(0 253)">
-      <rect width="126" height="54" rx="7" fill="#203e40" stroke="#527c78"/>
-      <rect x="140" width="126" height="54" rx="7" fill="#203e40" stroke="#527c78"/>
-      <rect x="280" width="125" height="54" rx="7" fill="#203e40" stroke="#527c78"/>
-      <path d="M126 27H140M266 27H280" stroke="#ffbd73" stroke-width="2"/>
-      <g font-family="Arial, Helvetica, sans-serif" font-size="11" letter-spacing="1" fill="#d6e9dd" text-anchor="middle">
-        <text x="63" y="32">SET THE SCENE</text>
-        <text x="203" y="32">DIRECT THE BEAT</text>
-        <text x="342.5" y="32">KEEP THE STATE</text>
-      </g>
-    </g>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="780" viewBox="0 0 1600 780" role="img" aria-labelledby="title desc">
+<title id="title">Seedance 2.5 — Your scene. Directed.</title>
+<desc id="desc">An original illustrated director's board: a quiet figure in a glass doorway, three connected shot frames, and the four choices of action, camera, performance and continuity.</desc>
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111411"/><stop offset="1" stop-color="#060807"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6c7970"/><stop offset=".38" stop-color="#28392f"/><stop offset="1" stop-color="#0d1812"/></linearGradient>
+ <radialGradient id="light"><stop stop-color="#e3e7c4" stop-opacity=".27"/><stop offset="1" stop-color="#e3e7c4" stop-opacity="0"/></radialGradient>
+ <linearGradient id="fade"><stop stop-color="#080b09" stop-opacity="0"/><stop offset="1" stop-color="#080b09" stop-opacity=".95"/></linearGradient>
+ <clipPath id="shot"><rect x="0" y="0" width="590" height="410" rx="9"/></clipPath>
+ <g id="figure">
+  <path d="M-28 100 Q-35 30 -17 3 Q0 -9 17 3 Q35 28 29 102Z" fill="#b8bba6"/>
+  <path d="M-21 103 L-24 166 L-9 166 L-2 110 L5 166 L21 166 L20 100" fill="#1b2220"/>
+  <ellipse cy="-12" rx="16" ry="20" fill="#c9bd9c"/>
+  <path d="M-18 -7 Q-22 -40 4 -35 Q22 -32 19 -4 L8 -18 L-8 -19Z" fill="#1b211c"/>
+  <path d="M-20 21 Q-21 50 0 61 Q19 52 21 21" fill="none" stroke="#8b9383" stroke-width="10" stroke-linecap="round"/>
+  <path d="M-8 58 Q0 62 9 58" fill="none" stroke="#ccbd9c" stroke-width="6" stroke-linecap="round"/>
+ </g>
+</defs>
+<rect width="1600" height="780" rx="20" fill="url(#bg)"/>
+<path d="M55 73H1545M55 699H1545" stroke="#313832"/>
+<g font-family="Arial, Helvetica, sans-serif">
+ <text x="62" y="47" fill="#9aa396" font-size="16" letter-spacing="3">MMM PROD / DIRECTOR'S TOOLS</text>
+ <text x="1538" y="47" text-anchor="end" fill="#bbcda2" font-size="16" letter-spacing="2">CLAUDE + CODEX</text>
+ <text x="63" y="157" fill="#d1e987" font-size="18" letter-spacing="4">FROM AN IDEA TO A SHOT</text>
+ <text x="56" y="247" fill="#f0eee2" font-size="80" font-weight="700" letter-spacing="-3">Seedance <tspan fill="#d1e987">2.5</tspan></text>
+ <text x="62" y="463" fill="#bac1b7" font-size="23">Turn a scene into a prompt with intention.</text>
+ <text x="62" y="499" fill="#bac1b7" font-size="23">Framing. Movement. Acting. Continuity.</text>
+ <path d="M62 541H705" stroke="#3c443d"/>
+ <text x="62" y="579" fill="#e9ebdd" font-size="18">Tell your assistant what you want to see.</text>
+ <text x="62" y="611" fill="#8f998f" font-size="18">Take the final prompt to your video interface.</text>
+</g>
+<g font-family="Georgia, 'Times New Roman', serif" fill="#f0eee2" font-size="70" letter-spacing="-1.5">
+ <text x="61" y="339">Your scene.</text>
+ <text x="61" y="414" font-style="italic" fill="#d1e987">Directed.</text>
+</g>
+<g transform="translate(894 122)">
+ <g clip-path="url(#shot)">
+  <rect width="590" height="410" fill="url(#glass)"/>
+  <ellipse cx="305" cy="80" rx="310" ry="350" fill="url(#light)"/>
+  <path d="M0 336 L590 248 V410H0Z" fill="#18231c"/>
+  <path d="M188 30 L463 53 V300 L188 324Z" fill="#111c17" stroke="#849187" stroke-width="2"/>
+  <path d="M324 42V312M200 116L454 87M230 32L454 97" stroke="#839187" opacity=".45"/>
+  <path d="M198 112 L315 45M337 247L450 186" stroke="#b5c1a1" stroke-width="7" opacity=".11"/>
+  <path d="M180 0L151 410M478 0L512 410" stroke="#7a8878" stroke-width="8" opacity=".45"/>
+  <path d="M188 324L463 300L532 350L131 391Z" fill="#a1ad8d" opacity=".12"/>
+  <use href="#figure" transform="translate(299 143)"/>
+  <path d="M253 310L249 363L321 351L318 309Z" fill="#020603" opacity=".4"/>
+  <rect x="0" y="290" width="590" height="120" fill="url(#fade)" transform="rotate(90 295 350)"/>
+ </g>
+ <rect width="590" height="410" rx="9" fill="none" stroke="#57624e"/>
+ <path d="M20 43V20H43M547 20H570V43M570 367V390H547M43 390H20V367" fill="none" stroke="#d1e987" stroke-width="2" opacity=".75"/>
+ <g font-family="'Courier New', monospace" font-size="13" letter-spacing="1" fill="#e7eadb">
+  <circle cx="42" cy="43" r="4" fill="#d1e987"/><text x="55" y="47">SCENE 01 / THE WAIT</text>
+  <text x="30" y="372">LOCKED FRAME</text><text x="557" y="372" text-anchor="end">06 SEC</text>
+ </g>
+ <g transform="translate(0 435)" font-family="'Courier New', monospace" font-size="12" fill="#c4cdbd">
+  <rect width="184" height="70" rx="5" fill="#1b251c" stroke="#414e3c"/>
+  <rect x="203" width="184" height="70" rx="5" fill="#19231b" stroke="#414e3c"/>
+  <rect x="406" width="184" height="70" rx="5" fill="#162017" stroke="#414e3c"/>
+  <path d="M184 35H203M387 35H406" stroke="#d1e987" stroke-width="2"/>
+  <text x="16" y="25" fill="#d1e987">01</text><text x="16" y="51">SET THE FRAME</text>
+  <text x="219" y="25" fill="#d1e987">02</text><text x="219" y="51">DIRECT THE BEAT</text>
+  <text x="422" y="25" fill="#d1e987">03</text><text x="422" y="51">KEEP CONTINUITY</text>
+ </g>
+</g>
+<g font-family="Arial, Helvetica, sans-serif" font-size="16" letter-spacing="2">
+ <text x="62" y="742" fill="#e4e5d7">ACTION</text><text x="283" y="742" fill="#e4e5d7">CAMERA</text>
+ <text x="516" y="742" fill="#e4e5d7">PERFORMANCE</text><text x="853" y="742" fill="#e4e5d7">CONTINUITY</text>
+ <text x="1538" y="742" text-anchor="end" fill="#859181">ORIGINAL ILLUSTRATION / MIT</text>
+</g>
 </svg>

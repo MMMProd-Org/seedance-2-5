@@ -1,67 +1,47 @@
 <p align="center">
-  <img src="assets/seedance-banner.svg" width="100%" alt="Seedance 2.5. Donnez un plan à votre scène : action, caméra, jeu et continuité.">
+  <img src="assets/seedance-banner.svg" width="100%" alt="Seedance 2.5 — une illustration originale pour diriger votre scène.">
 </p>
 
 <h1 align="center">Skill Seedance 2.5</h1>
 
 <p align="center">
-  <strong>Votre idée. Un prompt clair. Une scène avec une intention.</strong><br>
-  Un skill de mise en scène et d’écriture de prompts, pour Claude et Codex.
+  <strong>Vous voyez la scène. Votre assistant vous aide à la diriger.</strong><br>
+  Un skill de mise en scène pour transformer votre idée en prompt vidéo.
 </p>
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip"><strong>Télécharger le ZIP</strong></a>
+  <a href="https://github.com/MMMProd-Org/seedance-2-5/releases"><img src="https://img.shields.io/github/v/release/MMMProd-Org/seedance-2-5?style=flat-square&amp;color=d1e987&amp;label=release" alt="Dernière version publiée"></a>
+  <a href="https://github.com/MMMProd-Org/seedance-2-5/actions/workflows/check.yml"><img src="https://github.com/MMMProd-Org/seedance-2-5/actions/workflows/check.yml/badge.svg?branch=main" alt="Contrôles du skill"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-d1e987?style=flat-square" alt="Licence MIT"></a>
+</p>
+
+<p align="center">
+  <strong><a href="https://github.com/MMMProd-Org/seedance-2-5/releases/latest/download/seedance-2-5.zip">↓ Télécharger le skill (ZIP)</a></strong>
   &nbsp; · &nbsp;
-  <a href="https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.skill">Télécharger le .skill</a>
+  <a href="https://github.com/MMMProd-Org/seedance-2-5/releases/latest/download/seedance-2-5.skill">.skill</a>
   &nbsp; · &nbsp;
-  <a href="#installer-en-quelques-étapes">Installer</a>
+  <a href="#votre-premier-prompt-en-quelques-étapes">Installer</a>
   &nbsp; · &nbsp;
   <a href="README.md">English</a>
-  &nbsp; · &nbsp;
-  <a href="LICENSE">MIT</a>
 </p>
+
+<p align="center"><sub>Claude recommandé par l’auteur. Également conçu pour Codex.</sub></p>
+
+Le téléchargement ne démarre pas ? [Téléchargement direct du ZIP](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip).
 
 ---
 
-Vous avez une scène en tête : une personne qui attend, une caméra qui suit une
-voiture, un geste qui se poursuit au plan suivant. Ce skill aide votre assistant
-à en faire un prompt avec une action visible, des choix de caméra précis et des
-états cohérents.
+## Votre premier prompt, en quelques étapes
 
-Il aide aussi à parler d’un résultat décevant : ce que vous attendiez, ce qui
-apparaît et quelle consigne compte. Ces preuves servent à choisir la prochaine
-correction.
-
-**Assistant recommandé : Claude.** L’auteur rapporte ses meilleurs résultats
-avec Claude. Les mêmes fichiers s’installent dans Codex. Ce dépôt ne contient
-pas de comparaison contrôlée entre les deux assistants.
-
-## Ce qu’il vous aide à diriger
-
-| Votre scène demande… | Les fiches du skill couvrent… |
-| --- | --- |
-| Un plan lisible | Cadre, placement, optique, mouvement de caméra et lumière |
-| Un personnage présent | Tâche de jeu, écoute, dialogue et silence dirigé |
-| Une action compréhensible | Contacts, mouvement, cause et conséquence, duels et mécanismes |
-| Plusieurs plans raccordés | Temps de l’action, coupes, états des objets et continuité |
-| Des références bien utilisées | Personnage, lieu, look, voix et ancrage par l’image |
-| Un diagnostic utile | Consigne absente, contradictoire ou ignorée, avec ses preuves |
-
-Le skill rédige du texte à coller dans votre interface vidéo. Vous y générez la
-vidéo, puis vous pouvez rapporter le résultat pour l’examiner avec l’assistant.
-
-## Installer en quelques étapes
-
-### Claude web ou Desktop — pour démarrer facilement
-
-1. [Téléchargez le ZIP](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip). Gardez-le compressé.
+1. [Téléchargez le ZIP](https://github.com/MMMProd-Org/seedance-2-5/releases/latest/download/seedance-2-5.zip). Gardez-le compressé.
 2. Dans Claude, ouvrez **Customize → Skills → + Create skill → Upload a skill**.
 3. Importez le ZIP, activez le skill et démarrez une conversation sur votre scène.
 
 Si Skills n’apparaît pas, vérifiez l’activation de l’exécution de code ou les
 réglages de votre organisation. [Guide officiel d’installation](https://support.claude.com/en/articles/12512180-use-skills-in-claude).
 
-### Claude Code
+<details>
+<summary><strong>Claude Code</strong></summary>
 
 Téléchargez et décompressez le ZIP. Placez le dossier `seedance-2-5` entier dans
 votre dossier personnel de skills :
@@ -71,7 +51,7 @@ votre dossier personnel de skills :
 | Linux, macOS ou WSL | `~/.claude/skills/seedance-2-5/` |
 | Windows natif | `%USERPROFILE%\.claude\skills\seedance-2-5\` |
 
-`SKILL.md`, `references/`, `assets/`, `agents/` et `LICENSE` restent ensemble.
+`SKILL.md`, `references/`, `assets/`, `agents/`, `VERSION` et `LICENSE` restent ensemble.
 Ouvrez Claude Code et appelez le skill :
 
 ```text
@@ -80,7 +60,10 @@ Ouvrez Claude Code et appelez le skill :
 
 [Guide officiel des skills Claude Code](https://code.claude.com/docs/en/skills).
 
-### Codex
+</details>
+
+<details>
+<summary><strong>Codex</strong></summary>
 
 Téléchargez et décompressez le même ZIP. Placez le dossier `seedance-2-5` entier
 dans votre dossier personnel de skills :
@@ -106,7 +89,17 @@ dossier de skill actuel avant de le remplacer.
 Le téléchargement `.skill` contient les mêmes données ZIP. Pour le parcours
 d’import documenté par Claude, utilisez le fichier qui se termine par `.zip`.
 
-## Essayez avec votre scène
+</details>
+
+## Une idée. Des choix de mise en scène.
+
+« Une femme attend devant une entrée vitrée. » Un exemple de brief à donner à votre assistant :
+
+| Votre intention | Une direction concrète |
+| --- | --- |
+| Une attente contenue | Mains jointes, un souffle relâché, personne n’arrive |
+| Un cadre qui tient | Un plan moyen fixe, six secondes, sans coupe |
+| Une scène cohérente | La porte reste fermée, le personnage reste à sa place |
 
 **Un moment calme, sans référence nécessaire**
 
@@ -139,6 +132,20 @@ Indiquez votre durée, le format de l’image, l’action et vos références. V
 pouvez parler dans votre langue et choisir celle du prompt final. À défaut de
 langue demandée ou de prompt existant qui la fixe, le prompt est rédigé en anglais.
 
+## Ce qu’il vous aide à diriger
+
+| Votre scène demande… | Les fiches du skill couvrent… |
+| --- | --- |
+| Un plan lisible | Cadre, placement, optique, mouvement de caméra et lumière |
+| Un personnage présent | Tâche de jeu, écoute, dialogue et silence dirigé |
+| Une action compréhensible | Contacts, mouvement, cause et conséquence, duels et mécanismes |
+| Plusieurs plans raccordés | Temps de l’action, coupes, états des objets et continuité |
+| Des références bien utilisées | Personnage, lieu, look, voix et ancrage par l’image |
+| Un diagnostic utile | Consigne absente, contradictoire ou ignorée, avec ses preuves |
+
+Le skill rédige du texte à coller dans votre interface vidéo. Vous y générez la
+vidéo, puis vous pouvez rapporter le résultat pour l’examiner avec l’assistant.
+
 ## Ce que vous recevez
 
 Le format complet du skill prévoit une durée, un contrôle du texte, un seul
@@ -152,7 +159,20 @@ Deux cas complets de prompts sont également disponibles dans
 [le dossier d’exemples](skills/seedance-2-5/assets/cases/). Ce sont des textes ;
 ce dépôt ne contient ni clips générés ni images de référence pour ces cas.
 
-## Dans le téléchargement
+## Quelle version avez-vous ?
+
+**2.5 désigne le modèle ciblé. Le numéro du skill est distinct.**
+Ouvrez le fichier `VERSION` dans le dossier installé pour connaître votre version exacte.
+
+- [Dernière release](https://github.com/MMMProd-Org/seedance-2-5/releases/latest) : fichiers et résumé des changements.
+- [Toutes les versions](https://github.com/MMMProd-Org/seedance-2-5/releases) : retrouvez un ancien téléchargement.
+- `SHA256SUMS`, fourni avec chaque release, permet de vérifier les fichiers reçus.
+
+Le ZIP est recommandé pour l’import Claude. Le fichier `.skill` contient les mêmes données.
+Avant une mise à jour, conservez votre dossier actuel.
+
+<details>
+<summary><strong>Dans le téléchargement</strong></summary>
 
 ```text
 seedance-2-5/
@@ -160,6 +180,7 @@ seedance-2-5/
 ├── references/          23 fiches ciblées
 ├── agents/openai.yaml   Métadonnées de présentation pour Codex
 ├── assets/              Icône et deux cas textuels
+├── VERSION              Version du skill installé
 └── LICENSE              Licence MIT
 ```
 
@@ -167,13 +188,10 @@ Les fiches couvrent l’écriture du plan, le jeu, la physique, les références
 les séquences, le diagnostic, la syntaxe, les contraintes et la livraison.
 Le skill demande à l’assistant d’ouvrir les fiches utiles à la scène courante.
 
-**2.5 désigne le modèle ciblé par le skill.** Ce n’est pas un numéro de version
-de ce dépôt. Les capacités vidéo et les réglages dépendent de votre interface.
-Le contrôle de l’assistant porte sur le texte ; il reste nécessaire de regarder
-la vidéo générée. L’import dans chaque assistant et la qualité vidéo n’ont pas
-été testés pendant cette préparation. Consultez le [rapport de vérification](docs/verification.md).
+</details>
 
-## Pour maintenir le skill
+<details>
+<summary><strong>Pour maintenir le skill</strong></summary>
 
 Les sources modifiables sont dans [skills/seedance-2-5/](skills/seedance-2-5/).
 Les deux téléchargements sont fabriqués avec la bibliothèque standard de Python.
@@ -190,6 +208,12 @@ les chemins sûrs et l’identité entre sources et archives. Les tests utilisen
 des dossiers temporaires. La CI lance les mêmes tests et la vérification du
 paquet en lecture seule. Les règles de travail partagées sont dans
 [AGENTS.md](AGENTS.md), avec un renvoi depuis [CLAUDE.md](CLAUDE.md).
+
+</details>
+
+[Publication automatisée](docs/releasing.md) : changez le numéro du skill dans une PR. Après les contrôles et la fusion sur main, la release est publiée.
+
+L’import Claude/Codex et la qualité vidéo ne sont pas attestés par les tests de packaging. [Rapport de vérification](docs/verification.md).
 
 Un cas à améliorer ? [Ouvrez une issue](https://github.com/MMMProd-Org/seedance-2-5/issues)
 avec votre demande, le prompt et le résultat observé.

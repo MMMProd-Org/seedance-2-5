@@ -13,6 +13,22 @@ from urllib.parse import unquote, urlsplit
 SKILL_NAME = "seedance-2-5"
 
 
+def parse_version(content: bytes) -> str:
+    if (
+        re.fullmatch(rb"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\n", content)
+        is None
+    ):
+        raise ValueError("VERSION must contain major.minor.patch and one newline")
+    return content.decode("ascii").strip()
+
+
+def read_version(root: Path) -> str:
+    path = root / "skills" / SKILL_NAME / "VERSION"
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("Missing or symlinked VERSION")
+    return parse_version(path.read_bytes())
+
+
 def local_target(document: Path, target: str, boundary: Path) -> Path | None:
     address = urlsplit(target.strip("<>"))
     if address.scheme or address.netloc or not address.path:
@@ -68,9 +84,16 @@ def collect_source(root: Path) -> tuple[dict[str, bytes], int]:
         files[f"{SKILL_NAME}/{relative.as_posix()}"] = path.read_bytes()
         if path.suffix == ".md":
             links += check_links(path, source)
-    required = ["SKILL.md", "LICENSE", "agents/openai.yaml", "assets/icon.svg"]
+    required = [
+        "SKILL.md",
+        "LICENSE",
+        "VERSION",
+        "agents/openai.yaml",
+        "assets/icon.svg",
+    ]
     if any(f"{SKILL_NAME}/{name}" not in files for name in required):
-        raise ValueError("Missing required skill file")
+        raise ValueError("Missing required skill file (including VERSION)")
+    parse_version(files[f"{SKILL_NAME}/VERSION"])
     skill = files[f"{SKILL_NAME}/SKILL.md"].decode("utf-8")
     # shortcut: this skill uses a folded description; extend before changing YAML shape.
     metadata = re.match(
