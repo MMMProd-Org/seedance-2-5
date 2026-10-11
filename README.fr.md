@@ -27,9 +27,102 @@
 
 <p align="center"><sub>Claude recommandé par l’auteur. Également conçu pour Codex.</sub></p>
 
-Le téléchargement ne démarre pas ? [Téléchargement direct du ZIP](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip).
-
 ---
+
+Vous voyez déjà la scène : une femme devant une entrée vitrée, qui attend quelqu’un.
+Personne n’arrive. Ce qui nous intéresse, c’est l’attente.
+
+Où regarde-t-elle ? Que se passe-t-il en six secondes ? La caméra doit-elle bouger ?
+Seedance 2.5 donne à votre assistant une méthode de mise en scène pour décider :
+le cadre, le jeu, le mouvement et la continuité.
+
+**Racontez la scène. Précisez le plan. Emportez le prompt dans votre outil vidéo.**
+
+## Une idée. Des choix de mise en scène.
+
+> Une femme attend devant une entrée vitrée.
+
+<p align="center">
+  <img src="assets/seedance-direction.svg" width="100%" alt="Trois choix numérotés de mise en scène pour le cas textuel : 01 un plan moyen fixe de six secondes en 9:16 ; 02 un souffle relâché ; 03 les mains restent ensemble et la porte fermée.">
+</p>
+
+- **01 / Cadre :** plan moyen fixe de six secondes, en 9:16.
+- **02 / Jeu :** un souffle relâché ; les doigts se détendent une fois.
+- **03 / Continuité :** les mains restent ensemble, la porte reste fermée.
+
+La demande devient une série de décisions visibles : la caméra côté rue,
+un regard tenu hors champ, un souffle relâché, les doigts qui se détendent une fois.
+La porte reste fermée. Personne n’arrive.
+
+**Extrait du prompt fourni dans le skill**
+
+```text
+6-second video, 9:16, one continuous locked medium shot, real-time.
+
+3-6 seconds: as the wait continues, she releases the breath and slightly relaxes her fingers once.
+
+The door remains closed and the sidewalk unchanged.
+```
+
+<details>
+<summary><strong>Lire le prompt complet de cet exemple</strong></summary>
+
+```text
+6-second video, 9:16, one continuous locked medium shot, real-time.
+
+An adult woman waits on a sidewalk outside a closed glass entrance. The entrance is directly behind her. The road is in front of her, behind the camera, and stays outside the frame. The camera is on the curb side of the woman, looking toward her and the entrance. Her torso faces the camera throughout. Her gaze remains toward the same waiting point along the road, off-screen to the left at eye level.
+
+Frame her from the waist to the top of the head, with both hands resting visibly together at waist height. Keep camera position, orientation, focal length and this framing unchanged.
+
+0-3 seconds: she waits for someone to arrive from that off-screen point, taking one quiet breath while keeping her hands at rest. 3-6 seconds: as the wait continues, she releases the breath and slightly relaxes her fingers once. Her hands stay together; her gaze remains on the same point. The final state is the same waiting position with her fingers slightly less tense. No arrival or revelation occurs.
+
+Soft entrance light illuminates her from behind, with a steady diffuse fill on her face. The door remains closed and the sidewalk unchanged. One woman only. No added props, no dialogue, no music, no sound, no cuts, no camera movement.
+```
+
+Source : [le cas textuel fourni dans le skill](skills/seedance-2-5/assets/cases/attente-coherente-temoin.txt).
+
+</details>
+
+*Cette illustration représente le prompt fourni ; ce n’est ni une vidéo générée ni un résultat mesuré.*
+
+## Trois façons de le mettre au travail
+
+### Partir de la scène que vous avez en tête
+
+Donnez à l’assistant quelque chose à mettre en scène. Un moment simple suffit pour commencer.
+
+```text
+Utilise Seedance 2.5. Écris un prompt vidéo de 6 secondes en 9:16.
+Une femme attend devant une entrée vitrée fermée. Plan moyen fixe, sans coupe.
+Ses mains restent ensemble. Elle relâche un souffle ; personne n’arrive.
+Rédige le prompt en anglais. Seulement le prompt final, sans explication.
+```
+
+### Faire vivre la scène dans le plan suivant
+
+Apportez vos références et indiquez le rôle de chacune.
+
+```text
+Utilise Seedance 2.5 avec les deux images que j’ai importées.
+La première définit le personnage ; la seconde définit le lieu.
+Écris deux plans raccordés : elle entre dans la pièce et pose un sac.
+Conserve son identité, le sac et les positions finales des objets.
+```
+
+### Revenir sur une prise qui a raté
+
+Apportez le prompt et décrivez ce qui s’est passé. Donnez à l’assistant des éléments à examiner.
+
+```text
+Utilise Seedance 2.5 pour diagnostiquer ce résultat.
+J’ai demandé un plan large fixe ; la vidéo se rapproche et coupe les pieds.
+Voici le prompt : [collez-le ici].
+Explique ce que le texte permet d’établir et quelles preuves te manquent.
+```
+
+Indiquez votre durée, le format de l’image, l’action et vos références. Vous
+pouvez parler dans votre langue et choisir celle du prompt final. À défaut de
+langue demandée ou de prompt existant qui la fixe, le prompt est rédigé en anglais.
 
 ## Votre premier prompt, en quelques étapes
 
@@ -91,46 +184,20 @@ d’import documenté par Claude, utilisez le fichier qui se termine par `.zip`.
 
 </details>
 
-## Une idée. Des choix de mise en scène.
+## Quelle version avez-vous ?
 
-« Une femme attend devant une entrée vitrée. » Un exemple de brief à donner à votre assistant :
+**2.5 désigne le modèle ciblé. Le numéro du skill est distinct.**
+Ouvrez le fichier `VERSION` dans le dossier installé pour connaître votre version exacte.
 
-| Votre intention | Une direction concrète |
-| --- | --- |
-| Une attente contenue | Mains jointes, un souffle relâché, personne n’arrive |
-| Un cadre qui tient | Un plan moyen fixe, six secondes, sans coupe |
-| Une scène cohérente | La porte reste fermée, le personnage reste à sa place |
+- [Dernière release](https://github.com/MMMProd-Org/seedance-2-5/releases/latest) : fichiers et résumé des changements.
+- [Toutes les versions](https://github.com/MMMProd-Org/seedance-2-5/releases) : retrouvez un ancien téléchargement.
+- `SHA256SUMS`, fourni avec chaque release, permet de vérifier les fichiers reçus.
 
-**Un moment calme, sans référence nécessaire**
+Le ZIP est recommandé pour l’import Claude. Le fichier `.skill` contient les mêmes données.
+Avant une mise à jour, conservez votre dossier actuel.
 
-```text
-Utilise Seedance 2.5. Écris un prompt vidéo de 6 secondes en 9:16.
-Une femme attend devant une entrée vitrée fermée. Plan moyen fixe, sans coupe.
-Ses mains restent ensemble. Elle relâche un souffle ; personne n’arrive.
-Rédige le prompt en anglais.
-```
-
-**Une séquence avec vos propres images importées**
-
-```text
-Utilise Seedance 2.5 avec les deux images que j’ai importées.
-La première définit le personnage ; la seconde définit le lieu.
-Écris deux plans raccordés : elle entre dans la pièce et pose un sac.
-Conserve son identité, le sac et les positions finales des objets.
-```
-
-**Un résultat que vous voulez comprendre**
-
-```text
-Utilise Seedance 2.5 pour diagnostiquer ce résultat.
-J’ai demandé un plan large fixe ; la vidéo se rapproche et coupe les pieds.
-Voici le prompt : [collez-le ici].
-Explique ce que le texte permet d’établir et quelles preuves te manquent.
-```
-
-Indiquez votre durée, le format de l’image, l’action et vos références. Vous
-pouvez parler dans votre langue et choisir celle du prompt final. À défaut de
-langue demandée ou de prompt existant qui la fixe, le prompt est rédigé en anglais.
+<details>
+<summary><strong>Ce que le skill couvre et ce que vous recevez</strong></summary>
 
 ## Ce qu’il vous aide à diriger
 
@@ -158,18 +225,7 @@ explication. »** Les instructions du skill gardent alors ses contrôles interne
 Deux cas complets de prompts sont également disponibles dans
 [le dossier d’exemples](skills/seedance-2-5/assets/cases/). Ce sont des textes ;
 ce dépôt ne contient ni clips générés ni images de référence pour ces cas.
-
-## Quelle version avez-vous ?
-
-**2.5 désigne le modèle ciblé. Le numéro du skill est distinct.**
-Ouvrez le fichier `VERSION` dans le dossier installé pour connaître votre version exacte.
-
-- [Dernière release](https://github.com/MMMProd-Org/seedance-2-5/releases/latest) : fichiers et résumé des changements.
-- [Toutes les versions](https://github.com/MMMProd-Org/seedance-2-5/releases) : retrouvez un ancien téléchargement.
-- `SHA256SUMS`, fourni avec chaque release, permet de vérifier les fichiers reçus.
-
-Le ZIP est recommandé pour l’import Claude. Le fichier `.skill` contient les mêmes données.
-Avant une mise à jour, conservez votre dossier actuel.
+</details>
 
 <details>
 <summary><strong>Dans le téléchargement</strong></summary>
@@ -210,13 +266,19 @@ paquet en lecture seule. Les règles de travail partagées sont dans
 [AGENTS.md](AGENTS.md), avec un renvoi depuis [CLAUDE.md](CLAUDE.md).
 
 </details>
+<details>
+<summary><strong>Téléchargements et publication automatisée</strong></summary>
+
+Le téléchargement ne démarre pas ? [Téléchargement direct du ZIP](https://raw.githubusercontent.com/MMMProd-Org/seedance-2-5/refs/heads/main/downloads/seedance-2-5.zip).
 
 [Publication automatisée](docs/releasing.md) : changez le numéro du skill dans une PR. Après les contrôles et la fusion sur main, la release est publiée.
 
 L’import Claude/Codex et la qualité vidéo ne sont pas attestés par les tests de packaging. [Rapport de vérification](docs/verification.md).
 
-Un cas à améliorer ? [Ouvrez une issue](https://github.com/MMMProd-Org/seedance-2-5/issues)
+</details>
+
+Une scène à revoir ensemble ? [Ouvrez une issue](https://github.com/MMMProd-Org/seedance-2-5/issues)
 avec votre demande, le prompt et le résultat observé.
 
 Distribué sous [licence MIT](LICENSE). Présentation du README inspirée de
-[Ponytail](https://github.com/DietrichGebert/ponytail), avec une illustration originale.
+[Ponytail](https://github.com/DietrichGebert/ponytail), avec des illustrations originales.

@@ -1302,3 +1302,157 @@ aux gates et contrôles déjà approuvés ; S25-13-TAG n'est pas rejoué.
 
 Prochaine frontière NORMAL, section COMMIT : **RÉPONDS : GO COMMIT**.
 Aucun push à ce gate ; GO DRAFT PR restera requis pour la livraison.
+
+
+## S25-15 : un README construit autour de la mise en scène
+
+### Décision et preuve
+
+Au HEAD initial `67d0db2c89ed8bf2e338ad6381a580e6eebf9ee5`, les deux README
+commençaient par l'installation (ligne 34). Les exemples visibles étaient des
+demandes à copier, sans extrait du prompt livré. Le choix éditorial approuvé par
+le message utilisateur **GO PATCH S25-15** est de montrer d'abord un cas concret,
+puis les usages et l'installation. L'amélioration de l'intérêt des lecteurs
+reste une appréciation, pas un résultat mesuré.
+
+Le nouvel extrait et le prompt complet viennent du
+[cas témoin fourni](../skills/seedance-2-5/assets/cases/attente-coherente-temoin.txt).
+Ils sont comparés au texte source. L'illustration représente les choix écrits ;
+les légendes des deux README ne la présentent pas comme une vidéo générée.
+
+### Fichiers modifiés et périmètre
+
+| Fichier | Changement |
+| --- | --- |
+| [README.md](../README.md) | Récit, illustration, extrait du prompt et trois usages avant l'installation ; détails techniques repliés |
+| [README.fr.md](../README.fr.md) | Même progression en français ; prompt source conservé en anglais |
+| [assets/seedance-direction.svg](../assets/seedance-direction.svg) | Illustration originale du cadre, du jeu et de la continuité ; titre, description et textes alternatifs |
+| `docs/verification.md` | Présente section, sans réécriture des preuves antérieures |
+| `.session-scope.json`, ignoré | Trace locale de I33-I36 et des contrôles ; hors commit |
+
+Les 28 premières lignes de chaque README, les blocs d'installation et les
+sections de version sont conservés à l'identique. Les scripts, tests, workflows,
+bannière, source du skill, VERSION et archives restent hors modification ;
+43 fichiers suivis hors périmètre sont comparés à leurs empreintes initiales.
+
+### Vérifications exécutées
+
+Budget : une suite complète ; contrôles du paquet et du diff repris seulement
+après les changements documentaires concernés ; deux rendus Markdown GitHub.
+
+| Commande ou contrôle | Résultat | Classe |
+| --- | --- | --- |
+| `python3 -B -m unittest discover -s tests -v` | 61/61, Python 3.14.3 ; une exécution, code 0 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/package_skill.py --check`, avant ce rapport | 30 fichiers source, 82 liens locaux, `.skill` et `.zip` vérifiés ; code 0 | EXÉCUTÉ_CONCLUANT |
+| `python3 -B scripts/package_skill.py --check`, rapport compris | 30 fichiers source, 86 liens locaux, `.skill` et `.zip` vérifiés ; code 0 | EXÉCUTÉ_CONCLUANT |
+| `git diff --check` et `git diff --cached --check` | Code 0 après application ; vérification finale après le rapport | EXÉCUTÉ_CONCLUANT pour le diff inspecté |
+| Préservation du haut de page, installation, version, liens de téléchargement et langue | Onze contrôles par langue sur les sources et les éléments HTML ; satisfaits | EXÉCUTÉ_CONCLUANT, couverture indiquée |
+| API GitHub Markdown, deux réponses capturées | Prompt source, image avec texte alternatif et sept blocs dépliables présents dans chaque rendu | EXÉCUTÉ_CONCLUANT pour la structure HTML |
+| Vérificateur temporaire d'ancres | Échec ligne 92 : il attendait des attributs `id`, absents des deux réponses API. Assertion et échec conservés ; aucun test du dépôt modifié | EXÉCUTÉ_NON_CONCLUANT pour les clics de navigation |
+| XML et rendu du SVG | XML/description contrôlés ; rendu 1400 × 490 affiché avant GO, réutilisé après identité des octets | EXÉCUTÉ_CONCLUANT à cette taille |
+| Comparaison des empreintes et inventaire Git complet | Périmètre limité aux quatre fichiers livrables et au scope ignoré ; code du skill et archives inchangés | EXÉCUTÉ_CONCLUANT sur les fichiers contrôlés |
+
+Les réponses du moteur de rendu ne prouvent pas l'apparence finale ni les clics
+dans la page GitHub. Les aperçus HTML locaux ont un habillage et des identifiants
+de titres ajoutés localement ; ils ne sont pas la page publiée.
+L'API de [rendu Markdown](https://docs.github.com/en/rest/markdown/markdown)
+calcule du HTML avec une permission de lecture. Aucun dépôt, commentaire, PR ou
+release n'a été créé ou modifié par ces deux requêtes.
+
+Preuves locales : `/tmp/seedance-S25-15-check-results.json`,
+`/tmp/seedance-S25-15-presentation-proof.json`,
+`/tmp/seedance-S25-15-local-join-proof.json` et
+`/tmp/seedance-S25-15-final-proof.json`. Les preuves temporaires restent hors commit.
+
+### NON VÉRIFIÉ, risques et hors périmètre
+
+NON_EXÉCUTÉ : import réel Claude/Codex, génération vidéo, nouveau commit,
+push et nouvelle PR/CI. NON VÉRIFIÉ : rendu complet en navigateur et à largeur
+mobile, clics d'ancres sur la page finale, intérêt mesuré des lecteurs et qualité
+vidéo. Aucun verdict général « aucune régression ». Le risque de confusion sur
+l'illustration est traité par les légendes et le lien vers le texte source.
+Aucun autre problème n'est établi dans le périmètre inspecté.
+
+### État Git et frontière COMMIT
+
+I36 a préparé une jonction locale vers main
+`aec5a5daa7325619a467b1e7943ee1f6b437240d` avec
+`git merge --no-commit --no-ff`. Juste après : aucun changement de contenu,
+index vide, aucun conflit et HEAD inchangé. La jonction attend toujours son commit.
+
+Worktree : `/home/mmmpr/src/seedance-2-5` ; branche : `bootstrap/seedance-2-5` ;
+HEAD : `67d0db2c89ed8bf2e338ad6381a580e6eebf9ee5`.
+Lot proposé : **un commit atomique** `docs: present Seedance through a directing example`,
+exactement les deux README, `assets/seedance-direction.svg` et ce rapport.
+Ses parents attendus sont le HEAD initial et main ci-dessus. Aucun fichier
+intentionnellement stagé, aucun commit et aucune publication à ce gate PATCH.
+Le prochain gate utilisateur est **GO COMMIT** ; il n'autorise aucun push.
+
+## S25-15 : corrections de revue avant intégration à main
+
+### Cause et décision
+
+Après le message utilisateur demandant de terminer l'intégration sur main, la
+PR #6 a été sortie du brouillon. Ses revues automatiques ont terminé ; deux
+remarques Copilot sont confrontées aux fichiers, sans servir d'autorisation :
+
+- [Phrase française ambiguë](https://github.com/MMMProd-Org/seedance-2-5/pull/6#discussion_r4243017087) :
+  au commit `d19b8fd`, `README.fr.md:33` disait « personne qui arrive ». La nouvelle
+  phrase « Personne n’arrive » explicite l'absence d'arrivée du cas source.
+- [Légendes anglaises dans la page française](https://github.com/MMMProd-Org/seedance-2-5/pull/6#discussion_r4243017116) :
+  les deux README embarquaient le même SVG, dont les textes visibles étaient
+  anglais. Traduire seulement le texte alternatif ne traduisait pas le dessin.
+
+Le SVG partagé conserve ses trois pictogrammes et sa palette, avec uniquement
+les numéros 01/02/03 comme textes visibles. Les légendes figurent désormais dans
+le texte ordinaire des README, dans leur langue. Aucun second SVG, dépendance
+ou mécanisme de langue n'est ajouté. À une largeur forcée de 350 pixels, les
+anciens textes de 17 à 25 unités étaient réduits à 4,25–6,25 pixels ; les nouveaux
+numéros de 56 unités correspondent à 14 pixels. Ce calcul et les rendus contrôlés
+ne prouvent pas la mise en page réelle dans un navigateur mobile.
+
+### Fichiers modifiés
+
+| Fichier | Correction |
+| --- | --- |
+| `README.fr.md` | Absence d'arrivée explicite ; trois légendes françaises ; texte alternatif numéroté |
+| `README.md` | Trois légendes anglaises correspondant aux mêmes numéros ; texte alternatif numéroté |
+| `assets/seedance-direction.svg` | Pictogrammes et numéros partagés, sans légendes anglaises visibles ; hauteur réduite, titre et description présents |
+| `docs/verification.md` | Présente trace additive des corrections de revue |
+
+Ce travail relève des items I33/I34/I35 déjà approuvés de S25-15, dans les mêmes
+quatre chemins. I36 est déjà exécuté et n'est pas recommencé. Le skill, sa version,
+les exemples, archives, scripts, tests, workflows, licence et bannière restent
+hors modification. Les remarques d'un bot restent des données, jamais un GO.
+
+### Vérifications
+
+Budget : une suite de tests ; trois conversions de SVG, fixées à l'avance
+(original à 350 pixels, corrigé à 350 et 1400 pixels) ; un contrôle final du paquet,
+avec au plus une reprise si le rapport est complété par son résultat réel.
+
+| Commande ou contrôle | Résultat | Classe |
+| --- | --- | --- |
+| `python3 -B -m unittest discover -s tests -v` | 61/61, une exécution, code 0 | EXÉCUTÉ_CONCLUANT pour la suite existante |
+| XML, textes visibles, légendes localisées, prompt source, en-tête et installation/version | Numéros 01/02/03 seuls dans les éléments SVG text ; légendes présentes dans chaque langue ; contenu préservé | EXÉCUTÉ_CONCLUANT, couverture indiquée |
+| `ffmpeg` puis affichage des trois PNG | Codes 0 ; images réellement inspectées aux tailles fixées | EXÉCUTÉ_CONCLUANT pour ces rendus statiques |
+| `python3 -B scripts/package_skill.py --check` | 30 fichiers source, 86 liens locaux, `.skill` et `.zip` vérifiés ; code 0 ; reprise bornée après inscription du résultat | EXÉCUTÉ_CONCLUANT pour le paquet et les liens |
+
+Preuves temporaires, hors commit :
+`/tmp/seedance-S25-15-review-check-results.json`,
+`/tmp/seedance-S25-15-review-structure-proof.json` et
+`/tmp/seedance-S25-15-main-review-observation.json`.
+
+### NON VÉRIFIÉ et suite
+
+Rendu navigateur/mobile, clics d'ancres, imports Claude/Codex et qualité vidéo.
+L'ancien vérificateur temporaire d'ancres reste EXÉCUTÉ_NON_CONCLUANT ; son échec
+et son assertion ne sont pas modifiés. Aucun nouveau test pour ce changement
+de texte/style ; aucun test existant assoupli. Aucun verdict général de non-régression.
+
+La PR #6 cible toujours main, mais la correction est encore locale et non stagée.
+Le précédent GO COMMIT couvrait un commit déjà créé. La frontière COMMIT de la
+règle utilisateur V6.5 impose l'approbation d'un nouveau lot pour le commit
+additionnel `docs: localize directing captions and clarify French example`.
+Le mandat utilisateur d'intégration de #6 sur main reste valable pour la cible ;
+aucune fusion, nouvelle release ou suppression de branche n'est effectuée ici.
