@@ -42,10 +42,20 @@ For a new version, the job:
 
 1. Targets the exact checked commit, prepares a draft vMAJOR.MINOR.PATCH and
    includes the version, full commit SHA and GitHub-generated change notes.
-2. Uploads seedance-2-5.zip, seedance-2-5.skill and SHA256SUMS.
+2. Uploads seedance-2-5.zip, seedance-2-5.skill and SHA256SUMS to that release ID.
 3. Downloads and compares every asset, including size and any provided digest.
 4. Publishes using GitHub's native `make_latest: legacy` selection, then reads
    back the public release, commit tag and all three files.
+
+The creation response supplies the release ID. The publisher keeps that ID for
+uploads and subsequent reads, checking the tag, target commit and draft state
+at each stage. It does not require a newly created or updated release to appear
+immediately in the release listing. An existing release found by version is read
+again by ID before checking its state, target or assets. If that read shows the
+release is already public, the existing verification path checks its files and
+tag without writing. An identical published version keeps its original commit
+after documentation-only changes. API errors remain failures; no delay or retry
+is used to conceal an incomplete listing.
 
 Both archives have identical bytes and the same internal seedance-2-5 folder.
 SHA256SUMS records the SHA-256 of each archive. On Linux, macOS or WSL, download
@@ -72,11 +82,25 @@ jobs serialize by version so separate versions retain their pending jobs.
 A tag alone or a draft is **not** a published release. Check the workflow error
 and the [release page](https://github.com/MMMProd-Org/seedance-2-5/releases).
 
-A failed upload may leave a draft with some files. After correcting the cause,
-rerun the original failed workflow from its original commit. The script checks
-existing files, uploads only missing files, and resumes publication. It never
+A failed upload may leave a draft with some files. If the original commit's
+code is sufficient and the cause is corrected, rerun that workflow. The script
+checks existing files, uploads only missing files, and resumes publication. It never
 replaces an asset, moves a tag or deletes a release. A draft for another commit,
 a conflicting tag, a wrong digest or an API/permission error fails explicitly.
+
+If the cause needs a code fix, merging the fix starts a new workflow with the
+new code. Rerunning the old workflow still runs the old code; its draft also
+belongs to the old commit and is rejected by the new job.
+
+An empty, unpublished draft may be rebound only under an explicitly approved,
+targeted recovery plan. Verify its exact identity, old target and Checked commit
+line, that it has no assets or tag, that its old commit is an ancestor of the
+new main commit, and that the skill and downloads are identical between those
+commits. The PR checks and the new main checks must pass first. Change only its
+target and Checked commit line, preserving all other metadata, then verify the
+response and rerun the new workflow once. Stop on any changed precondition or
+failure. The publisher does not automate this exception; populated drafts and
+published releases are never rebound by this procedure.
 
 An identical public release is verified without any new write. An interrupted
 job that published before failing can therefore be rerun safely. Do not create
@@ -93,6 +117,8 @@ of the public release, its tag and assets. The direct ZIP link in each README
 remains available before the first release and if publication fails.
 
 Primary references, GitHub (accessed 11 October 2026):
-[release creation](https://cli.github.com/manual/gh_release_create),
+[release creation](https://docs.github.com/en/rest/releases/releases#create-a-release),
+[release reads by ID](https://docs.github.com/en/rest/releases/releases#get-a-release),
+[asset upload](https://docs.github.com/en/rest/releases/assets#upload-a-release-asset),
 [release update and latest policy](https://docs.github.com/en/rest/releases/releases#update-a-release),
 [workflow token permissions](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token).
